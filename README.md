@@ -1,20 +1,16 @@
 # AI Product Bootstrap
 
-One markdown file. Give it to your AI agent. It scaffolds your entire project — folders, roles, governance, and a roadmap for what to discuss first.
+You know the drill. You open Claude or ChatGPT, describe your idea, and the agent starts writing code immediately. By session three your repo is a mess — files dumped in random places, half your decisions buried in a chat you'll never scroll back to, and the AI has no idea what it built yesterday.
 
-Works with Claude, ChatGPT, Gemini, Copilot, Cursor, or whatever you use.
+This is one markdown file that fixes that. You give it to your AI agent, tell it what you're building, and it sets up your entire project with clear roles, organized folders, and a step-by-step plan for figuring things out in the right order.
 
-## Why
+Works with Claude, ChatGPT, Gemini, Copilot, Cursor — anything that can read a file.
 
-AI agents are great at writing code. They're terrible at organizing a project. Three sessions in and your files are everywhere, decisions are lost in chat history, and the AI jumps to code before you've figured out what you're actually building.
-
-This guide makes the agent stop and think. It assigns roles (we call them "hats"), creates folders ordered by how much they affect everything else, writes governance rules so nothing gets misplaced, and builds a phased roadmap so you discuss vision before architecture and architecture before code.
-
-## How it works
+## What actually happens
 
 1. Drop [`bootstrapping-guide.md`](bootstrapping-guide.md) into a conversation
-2. Describe what you're building
-3. The agent asks a few questions, then scaffolds this:
+2. Describe your project in a few sentences
+3. The agent walks you through a few questions, then generates something like this:
 
 ```
 0A-ceo/                  # Dashboard, priorities, roadmap
@@ -31,34 +27,40 @@ AA-journal/              # Session logs
 AB-decisions/            # Decision records
 ```
 
-Every folder gets a CLAUDE.md that says what goes there, what doesn't, and where to put things instead. The agent reads these at the start of each session so it actually remembers your project structure.
+Each folder gets governance rules — what belongs there, what doesn't, and where to redirect things that land in the wrong place. Next session, the agent reads these files first, so it picks up exactly where you left off instead of asking "what are we building again?"
 
-Folders scale to your project — a solo library might get 7, a team SaaS platform might get 16.
+Your project scales the structure. Solo weekend project? Maybe 7 folders. Team SaaS? Could be 16. The guide handles both.
 
-## The key ideas
+## How it thinks
 
-**Hats** — The agent declares a role before working. Product Owner thinks about scope. Developer thinks about architecture. QA thinks about edge cases. No more blurring everything together.
+The guide introduces three ideas that make AI agents way more useful:
 
-**Tiers** — Folders are numbered by influence. Vision is tier 1 (changes ripple everywhere). App code is tier 7 (changes stay local). You discuss tier 1 before tier 7.
+**Hats** — Before doing anything, the agent picks a role. Product Owner thinks about *what* to build. Developer thinks about *how*. QA thinks about what could break. You stop getting answers that mix strategy with implementation details.
 
-**Discussion roadmap** — The folders start empty. The roadmap tells you what to fill in and in what order, across multiple sessions.
+**Tiers** — Folders are ordered by blast radius. Vision (tier 1) affects everything. Code (tier 7) affects only itself. So you nail down your vision before picking a tech stack, and pick your tech stack before writing specs. Sounds obvious, but left to their own devices, AI agents skip straight to tier 7.
 
-## Examples in the guide
+**Discussion roadmap** — All those folders start as empty stubs. The roadmap is your plan for filling them in — one focused conversation at a time, in the right order, with clear deliverables for each phase.
+
+## Included examples
+
+The guide has full walkthroughs for different project sizes:
 
 - Open source library — 4 roles, 7 folders
 - CLI tool — 5 roles, 10 folders
 - SaaS platform — 10 roles, 16 folders
 - Analytics product — 6 roles, 10 folders
 
-Full templates included for every file type.
+Plus ready-to-use templates for every file: dashboards, role profiles, decision records, session logs, all of it.
 
 ## Contributing
 
-Open an issue or PR against `bootstrapping-guide.md`. This repo is intentionally just one guide file and a README.
+Found something that doesn't fit your project type? Open an issue or PR against `bootstrapping-guide.md`.
+
+This repo is intentionally just one file and a README. That's the whole point.
 
 ## Support
 
-If this saved you time:
+If this helped you ship faster:
 
 <a href="https://buymeacoffee.com/ThanhWilliamLe">
   <img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" />
