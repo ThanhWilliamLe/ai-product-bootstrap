@@ -1,17 +1,36 @@
+<div align="center">
+
 # AI Product Bootstrap
 
-If you've been using AI agents to build products, you've probably hit this: the first session goes great, the second is okay, and by the third the agent has forgotten your architecture, your files are all over the place, and you're spending more time re-explaining context than actually making progress.
+**A structured way to build products with AI agents.**
 
-I kept running into this, so I wrote a guide — a single markdown file you hand to the agent at the start of a project. It asks you about what you're building, then sets up a folder structure where each folder has a clear owner, clear rules about what goes in it, and pointers to what the agent should read before working there.
+Give this guide to your AI agent. It sets up your project with clear roles, organized folders, and a plan for what to figure out first.
 
-It works with Claude, ChatGPT, Gemini, Copilot, Cursor — really any agent that can read a file.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/ThanhWilliamLe/ai-product-bootstrap/pulls)
 
-## Usage
+</div>
 
-1. Drop [`bootstrapping-guide.md`](bootstrapping-guide.md) into a conversation with your AI agent
-2. Tell it what you're building
-3. Answer a few questions about your project
-4. The agent generates a structure like this:
+---
+
+For developers and founders who use AI agents to build products and are tired of re-explaining context every session.
+
+Works with Claude, ChatGPT, Gemini, Copilot, Cursor — anything that can read a markdown file.
+
+## How it works
+
+```mermaid
+flowchart LR
+    A["📄 You give the guide\nto your AI agent"] --> B["💬 Agent asks about\nyour project"]
+    B --> C["🏗️ Agent scaffolds\nfolders + governance"]
+    C --> D["🗺️ Agent generates\na discussion roadmap"]
+    D --> E["🔄 Next session:\nagent reads governance\nand picks up where\nyou left off"]
+```
+
+1. Drop [`bootstrapping-guide.md`](bootstrapping-guide.md) into a conversation
+2. Describe what you're building
+3. Answer a few questions
+4. The agent sets everything up:
 
 ```
 0A-ceo/                  # Dashboard, priorities, roadmap
@@ -28,34 +47,76 @@ AA-journal/              # Session logs
 AB-decisions/            # Decision records
 ```
 
-The number of folders depends on your project. A small library might only need 7. A bigger product could have 16. The guide figures this out with you.
+Each folder gets a governance file — what belongs there, what doesn't, where to redirect mistakes. Next session, the agent reads these first, so it has context without you re-explaining everything.
 
-Each folder gets a governance file that tells the agent what belongs there, what doesn't, and where to put things instead. So next session, the agent reads those files first and actually has context — instead of you having to re-explain everything.
+The number of folders scales to your project. A weekend library might get 7. A team SaaS product might get 16.
 
-## The three ideas behind it
+## What's behind it
 
-**Hats** — The agent picks a role before working. When it's wearing the Product Owner hat, it thinks about what to build and for whom. When it's wearing the Developer hat, it thinks about how to build it. This stops the thing where the agent mixes up "should we build this feature" with "here's the database schema" in the same breath.
+The guide is built on three ideas:
 
-**Tiers** — Folders are numbered by how much their decisions affect everything else. Vision is tier 1 — if that changes, everything downstream changes too. App code is tier 7 — changes stay local. The practical effect is you figure out the important stuff first, which seems obvious but AI agents will happily jump to writing code before you've even agreed on what the product does.
+```mermaid
+flowchart TD
+    subgraph Hats ["🎩 Hats — Roles"]
+        H1["Product Owner\n— what to build"]
+        H2["Developer\n— how to build it"]
+        H3["QA\n— what could break"]
+    end
 
-**Discussion roadmap** — The folders start empty. The roadmap is a plan for filling them in across multiple sessions — vision first, then users, then research, then scope, then design, then architecture, then code. Each phase has a clear goal and clear outputs.
+    subgraph Tiers ["📐 Tiers — Influence ordering"]
+        T1["Tier 1: Vision\n↓ changes ripple everywhere"]
+        T2["Tier 4: Architecture\n↓ changes ripple locally"]
+        T3["Tier 7: Code\n— changes stay here"]
+        T1 --> T2 --> T3
+    end
+
+    subgraph Roadmap ["🗺️ Roadmap — Fill in order"]
+        R1["Phase 1: Vision"] --> R2["Phase 2: Users"]
+        R2 --> R3["Phase 3: Scope"]
+        R3 --> R4["Phase 4: Design"]
+        R4 --> R5["Phase 5: Build"]
+    end
+```
+
+**Hats** — The agent declares a role before doing anything. Product Owner thinks about *what* to build. Developer thinks about *how*. QA thinks about what could break. This keeps perspectives separate instead of getting answers that mix strategy with implementation.
+
+**Tiers** — Folders are numbered by how much their decisions affect everything else. Vision is tier 1 — if it changes, everything downstream changes. Code is tier 7 — changes stay local. You work top-down, which AI agents won't do on their own.
+
+**Discussion roadmap** — Folders start as empty stubs. The roadmap plans how to fill them across sessions — vision first, then users, then scope, then design, then code. Each phase has a goal and deliverables.
+
+> [!TIP]
+> The guide handles all of this for you. You don't need to understand hats, tiers, or roadmaps before starting — the agent walks you through it.
 
 ## Examples
 
-The guide includes complete examples for different project sizes:
+The guide includes walkthroughs for different project sizes:
 
-- Open source library — 4 roles, 7 folders
-- CLI tool — 5 roles, 10 folders
-- SaaS platform — 10 roles, 16 folders
-- Analytics product — 6 roles, 10 folders
+| Project type | Roles | Folders |
+|-------------|-------|---------|
+| Open source library | 4 | 7 |
+| CLI tool | 5 | 10 |
+| SaaS platform | 10 | 16 |
+| Analytics product | 6 | 10 |
 
-It also has templates for every governance file — dashboards, role profiles, decision records, session logs, etc.
+Plus templates for every governance file — dashboards, role profiles, decision records, session logs.
+
+## Get started
+
+```bash
+# Clone and use
+git clone https://github.com/ThanhWilliamLe/ai-product-bootstrap.git
+
+# Or just grab the guide directly
+curl -O https://raw.githubusercontent.com/ThanhWilliamLe/ai-product-bootstrap/main/bootstrapping-guide.md
+```
+
+Then open it in a conversation with your AI agent and say what you're building.
 
 ## Contributing
 
 If you run into a project type that doesn't fit, open an issue or PR against `bootstrapping-guide.md`.
 
-This repo is just the guide and this README — that's intentional.
+This repo is intentionally just the guide and this README.
 
 ## Support
 
