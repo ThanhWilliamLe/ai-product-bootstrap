@@ -55,34 +55,21 @@ The number of folders scales to your project. A weekend library might get 7. A t
 
 The guide is built on three ideas:
 
-```mermaid
-flowchart TD
-    subgraph Hats ["🎩 Hats — Roles"]
-        H1["Product Owner\n— what to build"]
-        H2["Developer\n— how to build it"]
-        H3["QA\n— what could break"]
-    end
-
-    subgraph Tiers ["📐 Tiers — Influence ordering"]
-        T1["Tier 1: Vision\n↓ changes ripple everywhere"]
-        T2["Tier 4: Architecture\n↓ changes ripple locally"]
-        T3["Tier 7: Code\n— changes stay here"]
-        T1 --> T2 --> T3
-    end
-
-    subgraph Roadmap ["🗺️ Roadmap — Fill in order"]
-        R1["Phase 1: Vision"] --> R2["Phase 2: Users"]
-        R2 --> R3["Phase 3: Scope"]
-        R3 --> R4["Phase 4: Design"]
-        R4 --> R5["Phase 5: Build"]
-    end
-```
-
 **Hats** — The agent declares a role before doing anything. Product Owner thinks about *what* to build. Developer thinks about *how*. QA thinks about what could break. This keeps perspectives separate instead of getting answers that mix strategy with implementation.
 
-**Tiers** — Folders are numbered by how much their decisions affect everything else. Vision is tier 1 — if it changes, everything downstream changes. Code is tier 7 — changes stay local. You work top-down, which AI agents won't do on their own.
+**Tiers** — Folders are numbered by how much their decisions affect everything else. You work top-down, which AI agents won't do on their own.
 
-**Discussion roadmap** — Folders start as empty stubs. The roadmap plans how to fill them across sessions — vision first, then users, then scope, then design, then code. Each phase has a goal and deliverables.
+```mermaid
+flowchart LR
+    T1["Tier 1 · Vision\nchanges ripple everywhere"] --> T4["Tier 4 · Architecture\nchanges ripple locally"] --> T7["Tier 7 · Code\nchanges stay here"]
+```
+
+**Discussion roadmap** — Folders start as empty stubs. The roadmap plans how to fill them across sessions, each phase with a goal and deliverables.
+
+```mermaid
+flowchart LR
+    R1["Phase 1\nVision"] --> R2["Phase 2\nUsers"] --> R3["Phase 3\nScope"] --> R4["Phase 4\nDesign"] --> R5["Phase 5\nBuild"]
+```
 
 > [!TIP]
 > The guide handles all of this for you. You don't need to understand hats, tiers, or roadmaps before starting — the agent walks you through it.
