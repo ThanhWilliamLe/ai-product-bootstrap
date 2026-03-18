@@ -1,16 +1,17 @@
 # AI Product Bootstrap
 
-You know the drill. You open Claude or ChatGPT, describe your idea, and the agent starts writing code immediately. By session three your repo is a mess — files dumped in random places, half your decisions buried in a chat you'll never scroll back to, and the AI has no idea what it built yesterday.
+If you've been using AI agents to build products, you've probably hit this: the first session goes great, the second is okay, and by the third the agent has forgotten your architecture, your files are all over the place, and you're spending more time re-explaining context than actually making progress.
 
-This is one markdown file that fixes that. You give it to your AI agent, tell it what you're building, and it sets up your entire project with clear roles, organized folders, and a step-by-step plan for figuring things out in the right order.
+I kept running into this, so I wrote a guide — a single markdown file you hand to the agent at the start of a project. It asks you about what you're building, then sets up a folder structure where each folder has a clear owner, clear rules about what goes in it, and pointers to what the agent should read before working there.
 
-Works with Claude, ChatGPT, Gemini, Copilot, Cursor — anything that can read a file.
+It works with Claude, ChatGPT, Gemini, Copilot, Cursor — really any agent that can read a file.
 
-## What actually happens
+## Usage
 
-1. Drop [`bootstrapping-guide.md`](bootstrapping-guide.md) into a conversation
-2. Describe your project in a few sentences
-3. The agent walks you through a few questions, then generates something like this:
+1. Drop [`bootstrapping-guide.md`](bootstrapping-guide.md) into a conversation with your AI agent
+2. Tell it what you're building
+3. Answer a few questions about your project
+4. The agent generates a structure like this:
 
 ```
 0A-ceo/                  # Dashboard, priorities, roadmap
@@ -27,40 +28,36 @@ AA-journal/              # Session logs
 AB-decisions/            # Decision records
 ```
 
-Each folder gets governance rules — what belongs there, what doesn't, and where to redirect things that land in the wrong place. Next session, the agent reads these files first, so it picks up exactly where you left off instead of asking "what are we building again?"
+The number of folders depends on your project. A small library might only need 7. A bigger product could have 16. The guide figures this out with you.
 
-Your project scales the structure. Solo weekend project? Maybe 7 folders. Team SaaS? Could be 16. The guide handles both.
+Each folder gets a governance file that tells the agent what belongs there, what doesn't, and where to put things instead. So next session, the agent reads those files first and actually has context — instead of you having to re-explain everything.
 
-## How it thinks
+## The three ideas behind it
 
-The guide introduces three ideas that make AI agents way more useful:
+**Hats** — The agent picks a role before working. When it's wearing the Product Owner hat, it thinks about what to build and for whom. When it's wearing the Developer hat, it thinks about how to build it. This stops the thing where the agent mixes up "should we build this feature" with "here's the database schema" in the same breath.
 
-**Hats** — Before doing anything, the agent picks a role. Product Owner thinks about *what* to build. Developer thinks about *how*. QA thinks about what could break. You stop getting answers that mix strategy with implementation details.
+**Tiers** — Folders are numbered by how much their decisions affect everything else. Vision is tier 1 — if that changes, everything downstream changes too. App code is tier 7 — changes stay local. The practical effect is you figure out the important stuff first, which seems obvious but AI agents will happily jump to writing code before you've even agreed on what the product does.
 
-**Tiers** — Folders are ordered by blast radius. Vision (tier 1) affects everything. Code (tier 7) affects only itself. So you nail down your vision before picking a tech stack, and pick your tech stack before writing specs. Sounds obvious, but left to their own devices, AI agents skip straight to tier 7.
+**Discussion roadmap** — The folders start empty. The roadmap is a plan for filling them in across multiple sessions — vision first, then users, then research, then scope, then design, then architecture, then code. Each phase has a clear goal and clear outputs.
 
-**Discussion roadmap** — All those folders start as empty stubs. The roadmap is your plan for filling them in — one focused conversation at a time, in the right order, with clear deliverables for each phase.
+## Examples
 
-## Included examples
-
-The guide has full walkthroughs for different project sizes:
+The guide includes complete examples for different project sizes:
 
 - Open source library — 4 roles, 7 folders
 - CLI tool — 5 roles, 10 folders
 - SaaS platform — 10 roles, 16 folders
 - Analytics product — 6 roles, 10 folders
 
-Plus ready-to-use templates for every file: dashboards, role profiles, decision records, session logs, all of it.
+It also has templates for every governance file — dashboards, role profiles, decision records, session logs, etc.
 
 ## Contributing
 
-Found something that doesn't fit your project type? Open an issue or PR against `bootstrapping-guide.md`.
+If you run into a project type that doesn't fit, open an issue or PR against `bootstrapping-guide.md`.
 
-This repo is intentionally just one file and a README. That's the whole point.
+This repo is just the guide and this README — that's intentional.
 
 ## Support
-
-If this helped you ship faster:
 
 <a href="https://buymeacoffee.com/ThanhWilliamLe">
   <img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" />
