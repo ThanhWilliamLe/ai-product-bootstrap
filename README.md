@@ -2,11 +2,9 @@
 
 # AI Product Bootstrap
 
-**From idea to product. Solid, strategic, scaleable.**
+**A structured way to build products with AI agents. From idea to product, built to last.**
 
-**A structured way to build products with AI agents.**
-
-Give this guide to your AI agent. It sets up your project with clear roles, organized folders, and a plan for what to figure out first.
+Give this guide to your AI agent. The agent sets up organized folders and a plan for what to figure out first.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/ThanhWilliamLe/ai-product-bootstrap/pulls)
@@ -15,9 +13,9 @@ Give this guide to your AI agent. It sets up your project with clear roles, orga
 
 ---
 
-For developers and founders who use AI agents to build products and are tired of re-explaining context every session.
+For developers and founders who use AI agents to build products and are tired of re-explaining context each session.
 
-Works with Claude, ChatGPT, Gemini, Copilot, Cursor — anything that can read a markdown file.
+Works with Claude, ChatGPT, Gemini, Copilot, Cursor. Anything that reads markdown.
 
 ## How it works
 
@@ -32,7 +30,7 @@ flowchart LR
 1. Drop [`bootstrapping-guide.md`](bootstrapping-guide.md) into a conversation
 2. Describe what you're building
 3. Answer a few questions
-4. The agent sets everything up:
+4. The agent builds the project scaffold:
 
 ```
 0A-ceo/                  # Dashboard, priorities, roadmap
@@ -49,24 +47,24 @@ AA-journal/              # Session logs
 AB-decisions/            # Decision records
 ```
 
-Each folder gets a governance file — what belongs there, what doesn't, where to redirect mistakes. Next session, the agent reads these first, so it has context without you re-explaining everything.
+Each folder has a governance file that says what belongs and where to redirect mistakes. Next session, the agent reads these first and picks up your context.
 
-The number of folders scales to your project. A weekend library might get 7. A team SaaS product might get 16.
+The number of folders scales to your project. A weekend library might get 7, a team SaaS product 16.
 
 ## What's behind it
 
-The guide is built on three ideas:
+Three ideas drive the guide:
 
-**Hats** — The agent declares a role before doing anything. Product Owner thinks about *what* to build. Developer thinks about *how*. QA thinks about what could break. This keeps perspectives separate instead of getting answers that mix strategy with implementation.
+**Hats.** The agent declares a role before doing anything. Product Owner thinks about *what* to build, Developer thinks about *how*. You get focused answers instead of a mix of strategy and implementation.
 
-**Tiers** — Folders are numbered by how much their decisions affect everything else. You work top-down, which AI agents won't do on their own.
+**Tiers.** Folders are numbered by how much their decisions ripple outward. You work top-down. AI agents won't do that on their own.
 
 ```mermaid
 flowchart LR
     T1["Tier 1 · Vision\nchanges ripple everywhere"] --> T4["Tier 4 · Architecture\nchanges ripple locally"] --> T7["Tier 7 · Code\nchanges stay here"]
 ```
 
-**Discussion roadmap** — Folders start as empty stubs. The roadmap plans how to fill them across sessions, each phase with a goal and deliverables.
+**Discussion roadmap.** Folders start as empty stubs. You fill them across sessions, each phase with a goal and deliverables.
 
 ```mermaid
 flowchart LR
@@ -74,11 +72,11 @@ flowchart LR
 ```
 
 > [!TIP]
-> The guide handles all of this for you. You don't need to understand hats, tiers, or roadmaps before starting — the agent walks you through it.
+> You don't need to understand any of this before starting. The agent walks you through it.
 
 ## Examples
 
-The guide includes walkthroughs for different project sizes:
+See walkthroughs for different project sizes:
 
 | Project type | Roles | Folders |
 |-------------|-------|---------|
@@ -87,7 +85,7 @@ The guide includes walkthroughs for different project sizes:
 | SaaS platform | 10 | 16 |
 | Analytics product | 6 | 10 |
 
-Plus templates for every governance file — dashboards, role profiles, decision records, session logs.
+Plus templates for governance files: dashboards, role profiles, decision records, session logs.
 
 ## Get started
 
@@ -95,7 +93,7 @@ Plus templates for every governance file — dashboards, role profiles, decision
 # Clone and use
 git clone https://github.com/ThanhWilliamLe/ai-product-bootstrap.git
 
-# Or just grab the guide directly
+# Or grab the guide directly
 curl -O https://raw.githubusercontent.com/ThanhWilliamLe/ai-product-bootstrap/main/bootstrapping-guide.md
 ```
 
@@ -105,7 +103,7 @@ Then open it in a conversation with your AI agent and say what you're building.
 
 If you run into a project type that doesn't fit, open an issue or PR against `bootstrapping-guide.md`.
 
-This repo is intentionally just the guide and this README.
+This repo contains the guide and this README. Nothing else.
 
 ## Support
 
