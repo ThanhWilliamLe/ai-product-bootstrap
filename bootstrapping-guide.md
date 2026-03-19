@@ -96,10 +96,24 @@ Follow the steps below. Each step lists what to ask, what to decide, and what to
 - Solo or team?
 - Is there a user interface? (GUI, CLI, API, none)
 - Will this be publicly released?
-- Are there heavy assets (videos, design files, large images)?
 - Any existing work to incorporate?
 
 **Don't ask yet:** technical stack, architecture details, feature lists. Those come later during the discussion phases, not during bootstrapping. If the user volunteers this info unprompted, acknowledge it and note it for the architecture phase — don't ignore it, but don't let it drive bootstrapping decisions.
+
+#### Heavy Assets Decision Gate
+
+After the general questions above, explicitly raise this topic — don't let it slip by:
+
+> "Will this project involve large or binary files that shouldn't live in git? For example: videos, screen recordings, hi-res design exports, Figma/PSD source files, demo recordings, pitch deck videos, user interview recordings."
+
+**Why this matters early:** If heavy assets are part of the project, the infrastructure (`heavy-assets/` folder, `project-tools/` with sync tooling, `.gitignore` rules, cloud storage choice) must be scaffolded during bootstrap — not bolted on later. Retrofitting a heavy-assets workflow after work has started means files end up committed to git by accident, scattered in random locations, or lost between machines.
+
+**If the user says yes (or "probably" / "maybe"):**
+1. Note it — this triggers the Infrastructure Folders scaffolding in Step 5.
+2. Ask: "Where would you sync these to? Google Drive, Dropbox, S3, or something else?" (This informs the sync spec template.)
+3. Ask: "Which hats will produce heavy files?" (This determines which subdirectories to pre-create inside `heavy-assets/`.)
+
+**If the user says no:** Skip infrastructure folders entirely. They can be added later if needs change.
 
 ### Step 2: Choose Hats
 
@@ -234,7 +248,7 @@ AB-decisions/
    - Standard/Complex only: `priorities.md`, `cross-hat-dependencies.md`
    - For minimal projects (see Step 0), skip priorities and cross-hat-dependencies — they add overhead without value for solo work.
 3. Create cross-cutting folders (`AA-journal/`, `AB-decisions/`).
-4. Create infrastructure folders if needed (`heavy-assets/`, `project-tools/`) — no prefix.
+4. Create infrastructure folders if needed — no tier prefix. See **Infrastructure Folders** below.
 5. Create all subfolders within hat folders.
 6. Add `.gitkeep` to empty subfolders (remove once real files are added).
 7. Create all stub files with title + one-line description:
@@ -245,13 +259,6 @@ AB-decisions/
    ```
 8. Set up `.gitignore`:
    ```
-   # Heavy assets (if applicable)
-   heavy-assets/*
-   !heavy-assets/CLAUDE.md
-
-   # Machine-local config
-   .heavy-assets.config
-
    # OS
    .DS_Store
    Thumbs.db
@@ -262,6 +269,46 @@ AB-decisions/
    .idea/
    *.swp
    *.swo
+   ```
+
+#### Infrastructure Folders (Optional — triggered by Step 1 Heavy Assets Decision Gate)
+
+**Skip this section** if the user said "no" to heavy assets in Step 1. Otherwise, scaffold both folders now.
+
+```
+heavy-assets/          # Gitignored — large/binary files, mirroring hat structure
+  CLAUDE.md            # Always committed — explains the folder
+  {hat-folder}/        # Only for hats identified in Step 1 as producing heavy files
+    {subfolders}/      # e.g., 4A-design/mockups/, 6A-marketing/demo-videos/
+project-tools/         # Committed — scripts that operate on the project, not the product
+  CLAUDE.md
+  sync-heavy-assets.sh
+  sync-heavy-assets.spec.md
+```
+
+Pre-create only the subdirectories for hats the user identified in Step 1 as producing heavy files. Don't speculatively add subdirectories for every hat.
+
+**What goes where:**
+
+| Folder | Committed to git? | Contains |
+|--------|-------------------|----------|
+| `heavy-assets/` | No (gitignored, except `CLAUDE.md`) | Large/binary files organized by hat |
+| `project-tools/` | Yes | Sync scripts, setup scripts, workflow helpers |
+| `.heavy-assets.secret` | No (gitignored) | Machine-local sync credentials |
+
+**Scaffolding actions:**
+1. Create `heavy-assets/` with a `CLAUDE.md` (use the Heavy Assets CLAUDE.md template in Section 9).
+2. Pre-create subdirectories mirroring hat folders that will produce large files (e.g., `heavy-assets/4A-design/mockups/`). Add `.gitkeep` to empty ones.
+3. Create `project-tools/` with a `CLAUDE.md` (use the Project Tools CLAUDE.md template in Section 9).
+4. Create `project-tools/sync-heavy-assets.spec.md` — generate a full spec covering the topics listed in Section 9's Sync Heavy Assets Spec guidance. Adapt the cloud provider to match the user's answer from the Step 1 decision gate.
+5. Add these entries to `.gitignore`:
+   ```
+   # Heavy assets
+   heavy-assets/*
+   !heavy-assets/CLAUDE.md
+
+   # Sync tool secrets
+   .heavy-assets.secret
    ```
 
 ### Step 6: Generate Governance Files
@@ -497,10 +544,11 @@ After scaffolding, verify (items marked ★ apply to standard/complex only):
 5. **Every folder CLAUDE.md's "Read before producing work" references files that exist.** If a referenced file wasn't created as a stub in Step 5 (because the deliverable was uncertain), create it now — any file referenced as a dependency must exist.
 6. **The discussion roadmap references deliverable files that exist as stubs.**
 7. **Status dashboard is populated.**
-8. **`.gitignore` covers heavy assets, secrets, OS/IDE files.**
-9. ★ **Co-owned folders have per-hat guidance** in their CLAUDE.md (not just one hat's perspective).
-10. ★ **`priorities.md` and `cross-hat-dependencies.md` exist** in `0A-ceo/`.
-11. **No files exist outside the hat-based folder structure.** If any tool or skill created files in paths like `./docs/superpowers/specs/` or similar external locations, move them into the correct hat folder and delete the external path.
+8. **`.gitignore` covers OS/IDE files** (and heavy assets + secrets if infrastructure folders were enabled).
+9. **If heavy assets were enabled:** `heavy-assets/CLAUDE.md`, `project-tools/CLAUDE.md`, and `project-tools/sync-heavy-assets.spec.md` all exist.
+10. ★ **Co-owned folders have per-hat guidance** in their CLAUDE.md (not just one hat's perspective).
+11. ★ **`priorities.md` and `cross-hat-dependencies.md` exist** in `0A-ceo/`.
+12. **No files exist outside the hat-based folder structure.** If any tool or skill created files in paths like `./docs/superpowers/specs/` or similar external locations, move them into the correct hat folder and delete the external path.
 
 ### Step 9b: Multi-Round Audit
 
@@ -1173,4 +1221,46 @@ Mirrors the hat folder structure.
 - Text documents → hat folders in git
 - Source code → {app folder}
 - Small images (icons, SVGs) → {design folder}/assets/
+
+## Setup
+
+Machine-local config in `.heavy-assets.secret` (root, gitignored).
+Sync via `project-tools/sync-heavy-assets.sh`.
 ```
+
+### Project Tools CLAUDE.md
+
+```markdown
+# project-tools — Project Infrastructure Tooling
+
+> Tools that support working on the project, not the product itself.
+
+## What belongs here
+- Sync scripts (heavy-assets ↔ cloud storage)
+- Setup scripts (new machine bootstrapping)
+- Development workflow helpers
+- Any script that operates on the project structure
+
+## What does NOT belong here
+- Product source code → {app folder}
+- Build or CI scripts for the product → {app folder}
+- Documentation → hat folders
+- Secrets or machine-local config → root dotfiles (gitignored)
+
+## Conventions
+- Scripts should be self-documenting (usage info on `--help`)
+- Machine-specific config goes in root dotfiles (e.g., `.heavy-assets.secret`), not here
+- This folder is committed to git — no secrets
+```
+
+### Sync Heavy Assets Spec (`project-tools/sync-heavy-assets.spec.md`)
+
+Don't embed the full spec here — generate it as a standalone file. The spec should cover:
+
+- **Purpose:** Interactive tool to sync `heavy-assets/` with the user's chosen cloud storage (from Step 1 decision gate)
+- **Core operations:** Compare (diff local vs cloud), Push (local → cloud), Pull (cloud → local)
+- **Auth:** Support OAuth and service account modes; credentials stored in `.heavy-assets.secret` (root, gitignored)
+- **First-run setup:** Interactive flow to configure auth and cloud folder ID
+- **Safety:** Always show dry-run preview before changes; deletion is opt-in with separate confirmation; skip `CLAUDE.md` and `.gitkeep` during sync
+- **Implementation:** Recommend rclone wrapper as simplest approach; fall back to language-specific SDK if needed
+- **Platform:** Cross-platform (Windows Git Bash, macOS, Linux)
