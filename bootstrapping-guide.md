@@ -500,8 +500,27 @@ After scaffolding, verify (items marked ★ apply to standard/complex only):
 8. **`.gitignore` covers heavy assets, secrets, OS/IDE files.**
 9. ★ **Co-owned folders have per-hat guidance** in their CLAUDE.md (not just one hat's perspective).
 10. ★ **`priorities.md` and `cross-hat-dependencies.md` exist** in `0A-ceo/`.
+11. **No files exist outside the hat-based folder structure.** If any tool or skill created files in paths like `./docs/superpowers/specs/` or similar external locations, move them into the correct hat folder and delete the external path.
 
-**Then commit** with a message like: "Bootstrap project structure with hat-based governance"
+### Step 9b: Multi-Round Audit
+
+After the checklist above passes, run a multi-round audit before committing:
+
+1. **Self-audit** — Re-read every generated governance file with a critical eye. Check for:
+   - Internal consistency (do folder CLAUDE.md redirects point to folders that actually exist?)
+   - Completeness (are there hats without profiles? folders without governance?)
+   - Correctness (do tier assignments match the influence radius logic?)
+
+2. **Sub-agent audit** — Spawn a sub-agent to review the scaffolded structure independently. The sub-agent should:
+   - Not receive the original conversation context (fresh eyes)
+   - Walk the folder tree and validate each CLAUDE.md against the templates
+   - Cross-check hats.md against the actual folder structure
+   - Cross-check the discussion roadmap deliverables against existing stubs
+   - Report issues with specific file paths and line numbers
+
+3. **Reconciliation** — Compare self-audit and sub-agent findings. Fix all issues. If self and sub-agent disagree, default to the more thorough interpretation.
+
+Only after reconciliation passes: **commit** with a message like: "Bootstrap project structure with hat-based governance"
 
 **Tell the user:** "Project is bootstrapped. Start the next session and the agent will follow the session protocol — read dashboard, load hats, declare a hat, and start Phase 1 of the discussion roadmap."
 
@@ -577,6 +596,28 @@ Not every hat needs a written plan.
 
 The test: "Does only one hat read and write this plan?" If yes → subfolder. If multiple hats depend on it → top-level.
 
+### Persistence: Docs Over Memory
+
+All persistent notes, learnings, decisions, and context **must** be written into the project's folder structure — never into agent memory systems (e.g., `~/.claude/projects/*/memory/`). This applies to both the bootstrapping agent and all future agents.
+
+**Why:**
+- **Cross-machine portability** — memory is local to one machine/agent instance. Docs are in git, available everywhere.
+- **Auditability** — docs are version-controlled and diffable. Memory is opaque.
+- **No memory fallacies** — memory degrades across sessions, hallucinates details, and conflates contexts. Docs are stable.
+
+**Where to write instead of memory:**
+
+| What you'd put in memory | Write it here instead |
+|---|---|
+| Decisions made | `AB-decisions/session-decisions.md` or `AB-decisions/adr/` |
+| Session context / what happened | `AA-journal/sessions/{date}.md` |
+| Current status / blockers | `0A-ceo/status-dashboard.md` |
+| Cross-hat issues | `0A-ceo/cross-hat-dependencies.md` |
+| User preferences / project conventions | Root `CLAUDE.md` or relevant folder's `CLAUDE.md` |
+| Learnings about the product domain | Relevant hat folder (research, vision, etc.) |
+
+**Rule:** Agents must NOT use memory/recall features as a substitute for proper documentation. If information is worth persisting, it belongs in a governed, version-controlled file.
+
 ---
 
 ## 6. Reference: Session Protocol
@@ -608,6 +649,43 @@ Even in minimal mode, the agent should still check the status dashboard and decl
 ### Multi-Hat Sessions
 
 Declare all hats at start. When switching, make it explicit: "Switching from Product Owner to Developer hat."
+
+### Multi-Round Auditing Protocol
+
+After completing any significant artifact, phase, or body of work, agents must run a multi-round audit for objectivity and comprehensiveness:
+
+1. **Self-audit** — Re-read your own output critically. Check for:
+   - Internal consistency (does it contradict other project docs?)
+   - Completeness (are there gaps, vague hand-waves, or missing edge cases?)
+   - Correctness (do claims hold up? do references resolve?)
+   - Governance compliance (is the artifact in the right folder, following the right template?)
+
+2. **Sub-agent audit** — Spawn a sub-agent to review the output independently. The sub-agent:
+   - Must NOT receive the original conversation/reasoning context (fresh perspective)
+   - Reviews the artifact as if encountering it for the first time
+   - Checks against upstream dependencies listed in the folder's CLAUDE.md
+   - Validates against project governance (hat profiles, folder rules, templates)
+   - Reports issues with specific file paths, line numbers, and severity
+
+3. **Reconciliation** — Compare self-audit and sub-agent findings:
+   - Fix all issues both rounds agree on
+   - For disagreements, default to the more conservative/thorough interpretation
+   - Document any significant audit findings in `AA-journal/sessions/{date}.md`
+
+**When to audit:**
+- After bootstrap verification (Step 9 of bootstrapping protocol)
+- After completing a discussion roadmap phase
+- After producing any artifact that downstream consumers depend on
+- Before committing a batch of changes
+
+**When NOT to audit** (to avoid overhead on trivial work):
+- Single-line status dashboard updates
+- Adding a stub file
+- Fixing a typo
+
+### Docs Over Memory
+
+Agents must write all persistent notes into the project's folder structure, not into agent memory systems. See Section 5 → "Persistence: Docs Over Memory" for the full policy and routing table.
 
 ---
 
@@ -743,6 +821,16 @@ These are mistakes made during scaffolding, not during ongoing work:
 **Symptom:** Beautiful folder structure with governance files, but no plan for how to populate the stubs.
 **Fix:** Always generate the discussion roadmap (Step 8). The structure is useless without a path to filling it.
 
+### Creating Docs Outside the Project Structure
+
+**Symptom:** Agent creates files in `./docs/superpowers/specs/`, `./docs/`, or any path outside the hat-based folder structure. Common with AI tool skills/plugins that have hardcoded output paths.
+**Fix:** All artifacts must live in the project's tiered folder structure. There is no valid reason to create files outside the established structure. If a tool or skill defaults to an external path, override it — move the content into the correct hat folder, delete the external path, and add the external path to `.gitignore` as a safety net.
+
+### Persisting Context in Agent Memory
+
+**Symptom:** Agent saves project decisions, user preferences, or session context to its memory system (`~/.claude/projects/*/memory/` or equivalent) instead of project docs.
+**Fix:** All persistent information belongs in the project's version-controlled folder structure. Memory is machine-local, non-auditable, and prone to hallucination-style drift. See Section 5 → "Persistence: Docs Over Memory."
+
 ---
 
 ## 9. Templates
@@ -797,6 +885,32 @@ AB-decisions/            # Decision records — session decisions, ADRs
 **Spec change requests:** {Include this section only if specs folder is co-owned by multiple hats. If specs has a single owner, delete this subsection entirely. For co-owned specs: "When implementation reveals a spec problem: technical changes (schema types, error formats) → technical hat edits directly. Behavioral changes (scope, user-facing behavior) → non-technical hat approves first, upstream hats consulted if scope changes."}
 
 **Plans:** Optional by default. Consider writing when work is non-obvious or spans multiple sessions.
+
+### Multi-Round Auditing Protocol
+
+After completing any significant artifact or phase, run a multi-round audit:
+
+1. **Self-audit** — Re-read your output critically. Check internal consistency, completeness, correctness, and governance compliance.
+2. **Sub-agent audit** — Spawn a sub-agent (without original conversation context) to review independently. It checks against upstream dependencies, project governance, and templates, reporting issues with file paths and line numbers.
+3. **Reconciliation** — Fix all agreed issues. For disagreements, default to the more thorough interpretation. Document significant findings in `AA-journal/sessions/`.
+
+Skip auditing for trivial changes (status updates, typo fixes, stub additions).
+
+### Docs Over Memory
+
+All persistent notes, decisions, and context must be written into the project folder structure — never into agent memory systems. Memory is machine-local, non-auditable, and prone to drift.
+
+| Instead of memory... | Write to... |
+|---|---|
+| Decisions | `AB-decisions/` |
+| Session context | `AA-journal/sessions/` |
+| Status / blockers | `0A-ceo/status-dashboard.md` |
+| Cross-hat issues | `0A-ceo/cross-hat-dependencies.md` |
+| Conventions | Root or folder `CLAUDE.md` |
+
+### Output Location
+
+All artifacts must live in this project's folder structure. Never create files in external paths (e.g., `./docs/superpowers/specs/`). If a tool defaults to an external path, move the content into the correct hat folder and delete the external path.
 
 ## Hats
 
