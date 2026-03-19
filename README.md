@@ -2,6 +2,7 @@
 
 # AI Product Bootstrap
 
+**From idea to product. Structured, simplified, straightforward.**
 **A structured way to build products with AI agents.**
 
 Give this guide to your AI agent. It sets up your project with clear roles, organized folders, and a plan for what to figure out first.
