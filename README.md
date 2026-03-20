@@ -68,8 +68,10 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    R1["Phase 1\nVision"] --> R2["Phase 2\nUsers"] --> R3["Phase 3\nScope"] --> R4["Phase 4\nDesign"] --> R5["Phase 5\nBuild"]
+    R1["Phase 1\nVision"] --> R2["Phase 2\nUsers"] --> R3["Phase 3\nScope"] --> R4["Phase 4\nDesign"] --> R5["Phase 5\nBuild"] --> R6["Phase 6\nValidate"]
 ```
+
+**Autonomous continuation.** The dashboard has a machine-readable "Next Action" table. Agents pick up work without you prompting. After build, a validation loop spawns sub-agents as different users to test scenarios until 97% pass rate.
 
 > [!TIP]
 > You don't need to understand any of this before starting. The agent walks you through it.

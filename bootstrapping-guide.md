@@ -33,10 +33,11 @@ By the end of the protocol, the project will have:
 - Hat profiles defining each role
 - Per-folder CLAUDE.md files with ownership rules and redirects
 - A root CLAUDE.md with session protocol
-- An initialized CEO dashboard
+- An initialized CEO dashboard with next-action fields for autonomous continuation
 - A discussion roadmap for phased discovery across future sessions
 - Cross-cutting folders (journal, decisions)
 - Infrastructure folders if needed (heavy assets, project tools)
+- An autonomous agent protocol so agents can pick up work without human prompting
 
 ### What you know and don't know
 
@@ -189,13 +190,13 @@ Tier 7: App code (narrowest)
 | CEO | status-dashboard.md, priorities.md, cross-hat-dependencies.md, hats.md, discussion-roadmap.md | — |
 | Product Owner | problem-statement.md, product-goals.md, personas.md | — |
 | Product Owner (Roadmap) | roadmap.md, release-planning.md | — |
-| Business Analyst | ecosystem-research.md, competitive-landscape.md, format-mapping.md | comparisons/, diagrams/, data/, plans/ |
-| UX Designer | interaction-model.md | wireframes/, mockups/, prototypes/, assets/, plans/ |
+| Business Analyst | ecosystem-research.md, competitive-landscape.md, format-mapping.md, research-notes.md (methodology: source verification, cross-referencing official docs) | comparisons/, diagrams/, data/, plans/ |
+| UX Designer | interaction-model.md (include visual identity: palette, typography, component colors) | wireframes/, mockups/, prototypes/ (HTML prototypes encouraged — interactive, self-contained), assets/, plans/ |
 | Developer (Architecture) | data-model.md, tech-stack.md, system-design.md | diagrams/ |
 | Developer (Specs) | (populated just-in-time — one spec per feature) | — |
-| Developer (Build Plan) | implementation-plan.md, milestones.md | — |
-| Developer (App) | (source code — structure TBD) | — |
-| QA | test-strategy.md, edge-cases.md | reports/, plans/ |
+| Developer (Build Plan) | implementation-plan.md, milestones.md (each milestone: scope, dependencies, quality gate, done criteria) | — |
+| Developer (App) | source code, CI/CD config (.github/workflows/ or equivalent). CI at minimum: lint, typecheck, test, build. Multi-platform matrix if desktop/native. | — |
+| QA | test-strategy.md (comprehensive: unit, integration, API/contract, component, E2E, security, performance — see Phase 8 for full list; per-milestone quality gates), edge-cases.md | reports/, plans/ |
 | Marketing | — | copy/, collateral/, screenshots/, plans/ |
 | Rollout | distribution-strategy.md, first-run-experience.md | — |
 
@@ -205,7 +206,7 @@ Tier 7: App code (narrowest)
 - Two hats produce different types of artifacts in the same folder (e.g., Requirements: PO defines scope, BA analyzes feasibility)
 - The folder's content requires both a technical and non-technical perspective (e.g., Specs: Developer writes schemas, BA validates against requirements)
 
-For co-owned folders, document the split in the folder's CLAUDE.md: what each hat does there, and for change requests, which type of change each hat can make (see Section 5: Co-Owned Folders).
+For co-owned folders, document the split in the folder's CLAUDE.md: what each hat does there, and for change requests, which type of change each hat can make (see Section 5 → "Co-Owned Folders").
 
 **Determine multi-hat plan folders:** If a plan serves multiple hats (product roadmap, build plan, rollout plan), it gets its own top-level folder at the appropriate tier. Single-hat plans go in `plans/` subfolders.
 
@@ -270,6 +271,12 @@ AB-decisions/
    *.swp
    *.swo
    ```
+9. If the project will have source code, scaffold CI/CD early:
+   - Create `.github/workflows/ci.yml` (or equivalent for the user's platform)
+   - Minimum pipeline: checkout → setup runtime → install deps → lint → typecheck → test → build
+   - For desktop/native apps: add platform matrix (ubuntu, windows, macos)
+   - Working directory should target the app folder
+   - CI should run on push to main and on pull requests
 
 #### Infrastructure Folders (Optional — triggered by Step 1 Heavy Assets Decision Gate)
 
@@ -386,9 +393,14 @@ Includes: session start protocol, structure listing, conventions, three-layer go
 
 Populate `0A-ceo/status-dashboard.md` with the initial project state:
 - Current phase: "Project bootstrapped. Ready for Phase 1 of discussion roadmap."
+- Current milestone: "None — milestones defined during Build Plan Consolidation phase."
+- Next action: CEO hat, "Begin Phase 1 of discussion roadmap", target `{vision folder}/`.
 - All hats listed with status "Not Started" (except CEO: "Active").
 - No blockers (unless the user mentioned constraints).
 - Recently completed: "Project structure scaffolded."
+- Validation status: "Not started."
+
+The Next Action section is what enables autonomous continuation — an agent reading this dashboard knows exactly what to do next without asking.
 
 ### Step 8: Generate Discussion Roadmap
 
@@ -422,6 +434,8 @@ Phase 3: Research & Ecosystem (if BA hat exists)
   Hats: Business Analyst
   Goal: Investigate the ecosystem, competitive landscape, feasibility
   Populates: {research folder} — all research files
+  Methodology: Verify claims against official docs/repos. Cross-reference multiple
+    sources. Flag assumptions vs verified facts. Document methodology in research-notes.md.
   Note: Can run in parallel with Phase 2
   BLOCKING: If research reveals the ecosystem is different than assumed,
   Phase 4+ cannot start until research is verified. Mark as hard blocker.
@@ -452,9 +466,46 @@ Phase 7: Detailed Design (varies by project)
 
 Phase 8: Testing & Quality Strategy
   Hats: QA
-  Goal: Define what to test, how, acceptance criteria
+  Goal: Define comprehensive test strategy across all product layers
   Populates: {quality folder} — test-strategy.md, edge-cases.md
   Depends on: Phases 4, 6
+  Details:
+    test-strategy.md must address ALL applicable categories below.
+    For each included type: specify framework, coverage target, when it runs
+    (CI vs local vs manual), which milestones introduce it.
+    Skip types with explicit rationale ("No load tests: single-user local app").
+
+    FUNCTIONAL TESTING (does it work?):
+    - Unit — isolated functions, pure logic, parsing, validation, transforms
+    - Integration — modules together, real/in-memory DB, service interactions, fixtures
+    - API / contract — HTTP routes, response shapes, status codes, error formats, auth
+    - Component — UI renders correctly, props/state, interactions, a11y attributes
+    - System — full app in production-like environment, all services connected
+    - E2E — critical user journeys start-to-finish (one per core use case minimum,
+      derive from use-cases.md, list each journey explicitly)
+    - Smoke — quick post-build check that major functions work (run in CI on every push)
+    - Sanity — narrow check after a targeted fix, confirm fix works + no side effects
+    - Regression — re-run existing tests after changes to catch breakage (CI handles
+      this automatically if test suite is comprehensive; note any manual regression checks)
+
+    NON-FUNCTIONAL TESTING (does it work well?):
+    - Performance — response time baselines, render benchmarks, memory profiling
+      - Load — behavior under expected concurrent usage
+      - Stress — behavior beyond capacity, graceful degradation
+      - Endurance / soak — sustained load over time, memory leak detection
+    - Security — input sanitization, auth bypass, path traversal, XSS, CSRF, secrets
+      exposure, dependency vulnerability scanning (if Security hat exists, co-own)
+    - Usability — task completion, learnability, error recovery (often manual or
+      covered by validation loop with persona sub-agents)
+    - Accessibility — WCAG compliance, screen reader, keyboard nav, color contrast
+    - Compatibility — target OS/browser/device matrix, responsive breakpoints
+    - Snapshot / visual regression — UI consistency across changes (if UI exists)
+
+    EXECUTION NOTES:
+    - Automated (CI): unit, integration, API, component, E2E, smoke, regression, snapshot
+    - Manual / sub-agent: usability, accessibility audit, exploratory
+    - The validation loop (Post-Build phase) covers UAT — sub-agents as real personas
+    - Regression is implicit when CI runs full suite; note any MANUAL regression checks
 
 Phase 9: Rollout & Distribution (if applicable)
   Hats: Product Owner, Developer
@@ -469,10 +520,30 @@ Phase 10: Marketing & Launch (if Marketing hat exists)
   Depends on: Phases 1, 4, (5 if UX exists)
 
 Final: Build Plan Consolidation
-  Hats: Developer, Product Owner
-  Goal: Assemble the implementation plan from all prior phases
+  Hats: Developer, Product Owner, QA
+  Goal: Design milestones with quality gates, define done criteria per milestone
   Populates: {build-plan folder} — implementation-plan.md, milestones.md
   Depends on: All above phases
+  Details:
+    - Each milestone: scope (what ships), dependencies (what must exist first),
+      quality gate (automated commands: lint, typecheck, test, build),
+      done criteria (specific tests passing, coverage target)
+    - Milestone state machine: not-started → in-progress → gates-passing → complete
+    - QA hat defines per-milestone test requirements (which layers, what coverage)
+    - First milestone is always scaffold (toolchain, CI, empty shell)
+    - Last milestone is always integration & polish (full suite green)
+
+Post-Build: Automated Validation Loop
+  Hats: CEO (orchestrator), User (validator), all other hats (fixers)
+  Goal: Sub-agent validation until 97% scenario success rate
+  Populates: {quality folder}/reports/, {journal folder}/sessions/
+  Depends on: All milestones complete
+  Details:
+    - CEO spawns sub-agents wearing each persona hat to test real user scenarios
+    - Each sub-agent: attempts use cases end-to-end, reports pass/fail with evidence
+    - Failures filed as issues → owning hat fixes → re-test cycle
+    - Loop continues until success rate ≥ 97% across all scenarios
+    - See Section 6 → "Automated Validation Loop" for the full protocol
 ```
 
 #### How to customize the roadmap
@@ -735,6 +806,98 @@ After completing any significant artifact, phase, or body of work, agents must r
 
 Agents must write all persistent notes into the project's folder structure, not into agent memory systems. See Section 5 → "Persistence: Docs Over Memory" for the full policy and routing table.
 
+### Autonomous Continuation Protocol
+
+Agents should be able to pick up work and continue without human prompting. This requires machine-readable status.
+
+**The pick-up-work loop:**
+
+```
+1. Read 0A-ceo/status-dashboard.md
+2. Read the Next Action section — find the highest-priority hat with a pending action
+3. Read 0A-ceo/hats.md — load that hat's profile
+4. Read the target folder's CLAUDE.md
+5. Execute the next action
+6. Run quality gates (lint, typecheck, test, build)
+7. Update status-dashboard.md:
+   - Mark completed work in Recently Completed
+   - Set new Next Action for this hat (or clear if phase is done)
+   - Advance milestone state if quality gates pass
+8. Commit with descriptive message
+9. If more actions remain and no blockers: loop to step 1
+```
+
+**Next Action field:** The status dashboard must include a `Next Action` section with one entry per hat that has pending work. Each entry is machine-readable:
+
+```markdown
+## Next Action
+
+| Priority | Hat | Action | Target | Blocked By |
+|----------|-----|--------|--------|------------|
+| 1 | Developer | Implement M3 — Claude Code Adapter | 7A-app/ | — |
+| 2 | QA | Write integration tests for M2 | 5B-quality/ | — |
+| 3 | UX Designer | Create wireframes for Browse tab | 4A-design/wireframes/ | Phase 5 |
+```
+
+**Milestone state machine:** Track in `milestones.md`:
+
+```
+not-started → in-progress → gates-passing → complete
+```
+
+An agent advances state only after running the quality gate commands defined for that milestone. Never mark complete without evidence (test output, build success).
+
+**Quality gate commands:** Define in `implementation-plan.md` per milestone:
+
+```markdown
+### M3 — Claude Code Adapter
+- **Scope:** ...
+- **Quality gate:** `npm run lint && npm run typecheck && npm test -- --filter=adapter`
+- **Done when:** All adapter unit tests pass, integration test with fixture config passes
+```
+
+### Automated Validation Loop
+
+After all milestones are complete, the CEO hat orchestrates sub-agent validation:
+
+**Protocol:**
+
+```
+1. CEO reads all use cases from {requirements folder}/use-cases.md
+2. CEO reads all personas from {vision folder}/personas.md
+3. For each persona × relevant use case:
+   a. Spawn a sub-agent wearing that persona's hat
+   b. Sub-agent attempts the use case end-to-end (in the real app/code)
+   c. Sub-agent reports: PASS or FAIL with evidence (error, unexpected behavior, missing flow)
+4. Collect results into {quality folder}/reports/validation-round-{N}.md
+5. Calculate success rate: passed / total scenarios
+6. If success rate < 97%:
+   a. File each failure as an issue → identify owning hat
+   b. Owning hat fixes the issue
+   c. Run quality gates to ensure no regressions
+   d. Increment N, go to step 3 (re-test ALL scenarios, not just failures)
+7. If success rate ≥ 97%: mark validation complete in status dashboard
+```
+
+**Validation report format:**
+
+```markdown
+# Validation Round {N} — {date}
+
+Success rate: {X}% ({passed}/{total})
+
+| # | Persona | Use Case | Result | Evidence |
+|---|---------|----------|--------|----------|
+| 1 | Power User | UC-1 View Installed | PASS | — |
+| 2 | New Adopter | UC-3 Install | FAIL | Error: adapter not found for scope "local" |
+```
+
+**Key rules:**
+- Sub-agents get NO conversation context — they test as a fresh user would
+- Each round re-tests everything (fixes can introduce regressions)
+- The 97% threshold is a default — user can override
+- Validation is the last gate before marketing/launch phases
+
 ---
 
 ## 7. Examples
@@ -879,6 +1042,16 @@ These are mistakes made during scaffolding, not during ongoing work:
 **Symptom:** Agent saves project decisions, user preferences, or session context to its memory system (`~/.claude/projects/*/memory/` or equivalent) instead of project docs.
 **Fix:** All persistent information belongs in the project's version-controlled folder structure. Memory is machine-local, non-auditable, and prone to hallucination-style drift. See Section 5 → "Persistence: Docs Over Memory."
 
+### Milestones Without Quality Gates
+
+**Symptom:** Build plan has milestones but no automated verification commands. Agent marks milestones "complete" based on vibes.
+**Fix:** Every milestone must have a quality gate — a concrete command (e.g., `npm test -- --filter=adapter`) that must pass before state advances. No command passes, no state change.
+
+### Skipping Validation
+
+**Symptom:** All milestones complete, agent declares product "done" without testing real user scenarios.
+**Fix:** Run the automated validation loop (Section 6) with sub-agents wearing persona hats. Ship only after 97%+ scenario pass rate.
+
 ---
 
 ## 9. Templates
@@ -955,6 +1128,17 @@ All persistent notes, decisions, and context must be written into the project fo
 | Status / blockers | `0A-ceo/status-dashboard.md` |
 | Cross-hat issues | `0A-ceo/cross-hat-dependencies.md` |
 | Conventions | Root or folder `CLAUDE.md` |
+
+### Autonomous Continuation
+
+Agents can work without human prompting by following the pick-up-work loop:
+
+1. Read `0A-ceo/status-dashboard.md` → find the Next Action table
+2. Take the highest-priority unblocked action
+3. Execute, run quality gates, update dashboard
+4. If more actions remain and no blockers: continue
+
+Always update the Next Action table at session end so the next agent (or next session) can continue seamlessly.
 
 ### Output Location
 
@@ -1043,11 +1227,27 @@ When wearing a hat, adopt its perspective fully. Don't mix concerns — if you n
 ## Current Phase
 {Phase from discussion roadmap}
 
+## Current Milestone
+{Milestone ID} — {name} | State: {not-started / in-progress / gates-passing / complete}
+
+## Next Action
+
+| Priority | Hat | Action | Target | Blocked By |
+|----------|-----|--------|--------|------------|
+| 1 | {Hat} | {Specific action an agent can execute} | {folder/file} | {Blocker or —} |
+
 ## Hat Status
 
 | Hat | Status | Current Focus | Blocked By |
 |-----|--------|---------------|------------|
-| {Hat} | {Active / On Hold / Not Started} | {Focus} | {Blocker or —} |
+| {Hat} | {Active / On Hold / Not Started / Complete} | {Focus} | {Blocker or —} |
+
+## Milestones
+
+| ID | Name | State | Quality Gate |
+|----|------|-------|-------------|
+| M0 | Scaffold | complete | `npm run build` passes |
+| M1 | {name} | not-started | `{gate command}` |
 
 ## Blockers
 
@@ -1057,6 +1257,9 @@ When wearing a hat, adopt its perspective fully. Don't mix concerns — if you n
 
 ## Recently Completed
 - {What got done}
+
+## Validation Status
+{Not started / Round N — X% success rate / Complete — 97%+}
 ```
 
 ### Cross-Hat Dependencies
