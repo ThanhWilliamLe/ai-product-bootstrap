@@ -17,14 +17,15 @@ For developers and founders who use AI agents to build products and are tired of
 
 Works with Claude, ChatGPT, Gemini, Copilot, Cursor. Anything that reads markdown.
 
-## How it works
+## How to use
 
 ```mermaid
 flowchart LR
     A["📄 You give the guide\nto your AI agent"] --> B["💬 Agent asks about\nyour project"]
     B --> C["🏗️ Agent scaffolds\nfolders + governance"]
     C --> D["🗺️ Agent generates\na discussion roadmap"]
-    D --> E["🔄 Next session:\nagent reads governance\nand picks up where\nyou left off"]
+    D --> E["🔄 Agent picks up\nwork autonomously\nacross sessions"]
+    E --> F["✅ Validates with\nsub-agents until\n97% pass rate"]
 ```
 
 1. Drop [`bootstrapping-guide.md`](bootstrapping-guide.md) into a conversation
@@ -53,7 +54,7 @@ The number of folders scales to your project. A weekend library might get 7, a t
 
 ## What's behind it
 
-Three ideas drive the guide:
+Four ideas drive the guide:
 
 **Hats.** The agent declares a role before doing anything. Product Owner thinks about *what* to build, Developer thinks about *how*. You get focused answers instead of a mix of strategy and implementation.
 
@@ -89,23 +90,31 @@ See walkthroughs for different project sizes:
 
 Plus templates for governance files: dashboards, role profiles, decision records, session logs.
 
+### Built with this guide
+
+| Project | What it is | Tests | Status |
+|---------|-----------|-------|--------|
+| [ai-plugin-manager](https://github.com/ThanhWilliamLe/ai-plugin-manager) | Desktop app to manage AI tool plugins across Claude, Gemini, and more | 522 | All milestones complete |
+| [devlead-station](https://github.com/ThanhWilliamLe/devlead-station) | Local-first code review and team evaluation tool for dev leads | 416 | All milestones complete |
+
 ## Get started
 
 ```bash
-# Clone and use
-git clone https://github.com/ThanhWilliamLe/ai-product-bootstrap.git
-
-# Or grab the guide directly
+# Grab the guide
 curl -O https://raw.githubusercontent.com/ThanhWilliamLe/ai-product-bootstrap/main/bootstrapping-guide.md
 ```
 
-Then open it in a conversation with your AI agent and say what you're building.
+Drop it into a conversation with your AI agent and say what you're building. That's it.
+
+Or clone the repo if you want to track updates:
+
+```bash
+git clone https://github.com/ThanhWilliamLe/ai-product-bootstrap.git
+```
 
 ## Contributing
 
 If you run into a project type that doesn't fit, open an issue or PR against `bootstrapping-guide.md`.
-
-This repo contains the guide and this README. Nothing else.
 
 ## Support
 
