@@ -567,16 +567,41 @@ Phase 8: Testing & Quality Strategy
         stores caught accumulation bugs that unit tests missed.
     - Security — input sanitization, auth bypass, path traversal, XSS, CSRF, secrets
       exposure, dependency vulnerability scanning (if Security hat exists, co-own)
-    - Usability — task completion, learnability, error recovery (often manual or
-      covered by validation loop with persona sub-agents)
+    - Usability — four tiers of user-experience validation, each catching different
+      bug classes. Run in order; each tier is slower but catches issues invisible
+      to the previous tier:
+      1. UAT (code-level) — single QA agent walks predetermined scenarios against
+         source code, scores PASS/FAIL. Catches dead features, wiring bugs, broken
+         promises, swallowed errors. Fast (~30 min). See Post-Build validation loop.
+      2. Simulated user testing — 3-5 AI persona sub-agents read source code and
+         imagine using the app from their persona's perspective. Catches jargon,
+         wrong mental models, terminology inconsistency, first-run confusion,
+         missing tooltips. Fast (~5 min, parallel agents). Run before live testing.
+      3. Live agent testing — AI persona sub-agents build and launch the real app,
+         then interact via Playwright MCP tools (screenshot, click, fill, navigate).
+         They see real rendered pixels, not source code. Catches visual overlap,
+         broken click targets, timing/animation bugs, state desync, scroll/overflow
+         issues, visual hierarchy problems — an entire class of bugs invisible to
+         code review. Medium speed (~20-30 min, sequential agents sharing one app
+         instance). Run after simulated testing fixes land.
+      4. Real human testing — 3-5 actual humans use the app unguided. Catches
+         emotional reactions, motor skill issues, cultural assumptions, real-world
+         workflow interruptions. Slow (1-2 hrs per participant). Run after live
+         agent testing passes.
+      Recommended order: simulated → fix → live agent → fix → human.
+      For minimal projects, tier 1 (UAT) alone may suffice. For any product with
+      a UI, tiers 1-3 are recommended before release. Tier 4 before public launch.
     - Accessibility — WCAG compliance, screen reader, keyboard nav, color contrast
     - Compatibility — target OS/browser/device matrix, responsive breakpoints
     - Snapshot / visual regression — UI consistency across changes (if UI exists)
 
     EXECUTION NOTES:
     - Automated (CI): unit, integration, API, component, E2E, smoke, regression, snapshot
-    - Manual / sub-agent: usability, accessibility audit, exploratory
-    - The validation loop (Post-Build phase) covers UAT — sub-agents as real personas
+    - Sub-agent (pre-release): UAT validation loop, simulated user testing, live agent testing
+    - Manual: real human usability, accessibility audit, exploratory
+    - The validation loop (Post-Build phase) covers UAT (tier 1). Simulated and live
+      agent testing (tiers 2-3) run alongside or after the validation loop — see
+      Section 6 for the full protocol.
     - Regression is implicit when CI runs full suite; note any MANUAL regression checks
 
 Phase 9: Rollout & Distribution (if applicable)
@@ -1006,14 +1031,20 @@ Agent C: Subsystem 3 (owns: files in src/feature-c/)
 
 Each agent owns specific files or directories. No two agents touch the same files. CEO orchestrates and reconciles. Define ownership boundaries by feature directory, module, or file name pattern — whatever creates the cleanest separation for your codebase.
 
-**Simulated usability testing:** Before or alongside the validation loop, run a simulated usability test with 3-5 AI personas walking through every major flow independently:
+**Simulated usability testing (tier 2):** Before or alongside the validation loop, run a simulated usability test with 3-5 AI personas reading source code and imagining using the app from their persona's perspective:
 
 ```
-1. Define 3-5 diverse personas (e.g., Power User, New Adopter, Non-Technical User, Team Lead, Single-Tool User)
-2. Each persona walks through the app independently with realistic scenarios
-3. Each persona reports issues from their perspective with severity ratings
-4. Cross-persona convergence analysis: issues flagged by 3+ personas are highest-confidence findings
-5. Fix convergent issues first, then address persona-specific issues
+1. Read all persona profiles from {vision folder}/personas.md
+2. Read the interaction model / wireframes from {design folder}/
+3. Read actual component source code for every screen the personas will encounter
+4. Dispatch 3-5 parallel persona agents, each with:
+   - Their persona profile (role, technical level, pain points, goals)
+   - The full app structure and interaction model
+   - Key details from actual source code (the real rendered UI, not just specs)
+   - 4-6 realistic scenarios tailored to their persona's goals
+   - Structured output format (issue ID, severity, persona impact, suggestion)
+5. Synthesize: cross-persona convergence (3+ personas) = highest confidence
+6. Fix convergent issues first, then persona-specific issues
 ```
 
 Report format:
@@ -1034,7 +1065,64 @@ Report format:
 
 Real example: 5-persona test found 107 issues with 7 cross-persona convergent themes, leading to 16 concrete fixes (keyboard shortcuts, terminology standardization, first-run UX, tooltips).
 
-Note: Simulated testing is fast and scalable but doesn't replace real human testing. Document explicitly: "Simulated usability test complete. Real human testing recommended for validation."
+**What simulated testing catches:** Jargon, unexplained terminology, missing tooltips, broken flows, terminology inconsistency, first-run onboarding gaps, error recovery dead ends.
+**What it misses (need live or human testing):** Actual visual rendering, click target responsiveness, timing/animation bugs, motor skill issues, emotional reactions.
+
+**Live agent testing (tier 3):** After simulated testing fixes land, AI persona agents build, launch, and interact with the real running app via Playwright MCP tools. They take screenshots, read the actual rendered UI, click buttons, fill forms, navigate tabs — like a human tester sitting in front of the screen. They see **real pixels**, not source code.
+
+Why this tier exists: A button can look correct in code but render offscreen, overlap another element, or fail to respond to clicks due to z-index/event handler issues. This catches an entire class of bugs invisible to code review.
+
+```
+1. Build and launch the app (e.g., npm run build && npm start, or equivalent)
+2. Verify the app is running (screenshot + DOM snapshot)
+3. Dispatch persona agents SEQUENTIALLY (not parallel — they share one app instance,
+   each agent's actions affect the next. Alternatively, relaunch between agents.)
+4. Each agent receives:
+   - Their persona profile (from {vision folder}/personas.md)
+   - Access to Playwright MCP tools (screenshot, click, snapshot, fill, press key)
+   - 3-5 task-based scenarios (goal-oriented, not step-by-step)
+   - Instructions: "You are a real user. You can ONLY see what's on screen.
+     You cannot read source code. Discover features by exploring."
+5. Agent interaction loop per task:
+   a. Screenshot current state
+   b. Read DOM snapshot (accessibility tree)
+   c. Decide next action based on persona goals
+   d. Perform action (click, type, press key)
+   e. Screenshot result
+   f. Evaluate: did the expected thing happen? If not → log finding
+6. Synthesize findings across all agents
+7. Cross-reference with simulated testing — flag issues NOT caught by code review
+8. Categorize: Visual | Interaction | Timing | State | Navigation | Accessibility
+```
+
+Report format:
+```markdown
+# Live Agent Test — {date}
+
+Build: {version/commit}  Window: {width}x{height}  Personas: {list}
+
+## Findings
+| ID | Persona | Task | Severity | Category | What Happened | Expected |
+|----|---------|------|----------|----------|---------------|----------|
+| LAT-1 | Power User | Export bundle | HIGH | Interaction | Button unresponsive | File save dialog |
+
+## New Findings (not caught by simulated testing)
+{Issues that simulated testing missed because they only manifest visually}
+
+## Comparison: Simulated vs. Live
+| Dimension | Simulated (code) | Live Agent (pixels) |
+|-----------|-----------------|---------------------|
+| Jargon/terminology | Strong | Weak (agent knows jargon) |
+| Visual/layout bugs | Cannot see UI | Strong |
+| Interaction bugs | Imagines interactions | Actually clicks |
+| Timing/animation | No runtime | Real runtime |
+```
+
+**Safety for live agent testing:** Some tasks involve destructive actions (install, uninstall, settings changes). For the first run, limit to **read-only exploration** (browse, navigate, search, open panels, screenshot). Destructive actions only against fixture/test data or after user confirmation.
+
+**Recommended overall order:** Simulated (tier 2) → fix → Live agent (tier 3) → fix → Human (tier 4).
+
+Note: Neither simulated nor live agent testing replaces real human testing. Document explicitly: "AI user testing complete. Real human testing recommended before public launch."
 
 ### User Testing Protocol (for root CLAUDE.md)
 
@@ -1043,7 +1131,13 @@ Add this section to the root CLAUDE.md template when personas are defined:
 ```markdown
 ### User Testing Protocol
 
-When "user testing" is requested, simulate **all personas** defined in `{vision folder}/personas.md` — not just the primary. Optionally, improvise 1-2 ad-hoc personas (e.g., a skeptical first-timer, a non-technical manager) to stress-test from unexpected angles. Each persona reports independently; reconciliation happens cross-persona, not per-persona.
+When "user testing" or "do user testing" is requested, run **simulated user testing** (tier 2): spawn 3-5 parallel sub-agents, each role-playing a persona from `{vision folder}/personas.md`. Each agent reads source code and reports issues from their persona's perspective. Reconcile cross-persona.
+
+When "live testing" or "test the real app" is requested, run **live agent testing** (tier 3): build and launch the app, then spawn sequential sub-agents that interact via Playwright MCP tools (screenshot, click, fill, navigate). Agents see real pixels only — no source code. Report visual, interaction, timing, and state issues.
+
+Default trigger "user testing" = simulated (tier 2). Use "live testing" explicitly for tier 3. Run both before release: simulated → fix → live → fix.
+
+All personas from `{vision folder}/personas.md` participate — not just the primary. Optionally add 1-2 ad-hoc personas (skeptical first-timer, non-technical manager). Each reports independently; reconciliation is cross-persona.
 ```
 
 ---
@@ -1376,7 +1470,13 @@ Always update the Next Action table at session end so the next agent (or next se
 
 ### User Testing Protocol
 
-When "user testing" is requested, simulate **all personas** defined in `{vision folder}/personas.md` — not just the primary. Optionally, improvise 1-2 ad-hoc personas (e.g., a skeptical first-timer, a non-technical manager) to stress-test from unexpected angles. Each persona reports independently; reconciliation happens cross-persona, not per-persona.
+When "user testing" or "do user testing" is requested, run **simulated user testing** (tier 2): spawn 3-5 parallel sub-agents, each role-playing a persona from `{vision folder}/personas.md`. Each agent reads source code and reports issues from their persona's perspective. Reconcile cross-persona.
+
+When "live testing" or "test the real app" is requested, run **live agent testing** (tier 3): build and launch the app, then spawn sequential sub-agents that interact via Playwright MCP tools (screenshot, click, fill, navigate). Agents see real pixels only — no source code. Report visual, interaction, timing, and state issues.
+
+Default trigger "user testing" = simulated (tier 2). Use "live testing" explicitly for tier 3. Run both before release: simulated → fix → live → fix.
+
+All personas from `{vision folder}/personas.md` participate — not just the primary. Optionally add 1-2 ad-hoc personas (skeptical first-timer, non-technical manager). Each reports independently; reconciliation is cross-persona.
 
 ### End-of-Session Sync
 
