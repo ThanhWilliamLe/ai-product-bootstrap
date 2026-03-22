@@ -2,7 +2,7 @@
 
 # AI Product Bootstrap
 
-**A structured way to build products with AI agents. From idea to product, built to last.**
+**A structured way to build products with AI agents. One markdown file. Works with any LLM.**
 
 Give this guide to your AI agent. The agent sets up organized folders and a plan for what to figure out first.
 
@@ -25,13 +25,15 @@ flowchart LR
     B --> C["🏗️ Agent scaffolds\nfolders + governance"]
     C --> D["🗺️ Agent generates\na discussion roadmap"]
     D --> E["🔄 Agent picks up\nwork autonomously\nacross sessions"]
-    E --> F["✅ Validates with\nsub-agents until\n97% pass rate"]
+    E --> F["✅ Validates with\nsub-agents until\ntests pass"]
 ```
 
 1. Drop [`bootstrapping-guide.md`](bootstrapping-guide.md) into a conversation
 2. Describe what you're building
 3. Answer a few questions
 4. The agent builds the project scaffold:
+
+The number of folders scales to your project. A weekend library might get 7, a team SaaS product 16. Here's a standard example:
 
 ```
 0A-ceo/                  # Dashboard, priorities, roadmap
@@ -49,8 +51,6 @@ AB-decisions/            # Decision records
 ```
 
 Each folder has a governance file that says what belongs and where to redirect mistakes. Next session, the agent reads these first and picks up your context.
-
-The number of folders scales to your project. A weekend library might get 7, a team SaaS product 16.
 
 ## What's behind it
 
@@ -72,14 +72,14 @@ flowchart LR
     R1["Phase 1\nVision"] --> R2["Phase 2\nUsers"] --> R3["Phase 3\nScope"] --> R4["Phase 4\nDesign"] --> R5["Phase 5\nBuild"] --> R6["Phase 6\nValidate"]
 ```
 
-**Autonomous continuation.** The dashboard has a machine-readable "Next Action" table. Agents pick up work without you prompting. After build, a validation loop spawns sub-agents as different users to test scenarios until 97% pass rate.
+**Autonomous continuation.** The dashboard has a machine-readable "Next Action" table. Agents pick up work without you prompting. After build, a validation loop spawns sub-agents as different users to test scenarios.
 
 > [!TIP]
 > You don't need to understand any of this before starting. The agent walks you through it.
 
 ## Examples
 
-See walkthroughs for different project sizes:
+The guide includes examples for different project sizes:
 
 | Project type | Roles | Folders |
 |-------------|-------|---------|
@@ -94,8 +94,9 @@ Plus templates for governance files: dashboards, role profiles, decision records
 
 | Project | What it is | Tests | Status |
 |---------|-----------|-------|--------|
-| [ai-plugin-manager](https://github.com/ThanhWilliamLe/ai-plugin-manager) | Desktop app to manage AI tool plugins across Claude, Gemini, and more | 522 | All milestones complete |
-| [devlead-station](https://github.com/ThanhWilliamLe/devlead-station) | Local-first code review and team evaluation tool for dev leads | 416 | All milestones complete |
+| [ai-plugin-manager](https://github.com/ThanhWilliamLe/ai-plugin-manager) | Desktop app to manage AI tool plugins across Claude, Gemini, and more | 1,780+ | v1.5 shipped |
+| [devlead-station](https://github.com/ThanhWilliamLe/devlead-station) | Local-first code review and team evaluation tool for dev leads | 596 | v1.2 shipped |
+| [ai-animator](https://github.com/ThanhWilliamLe/ai-animator) | AI-powered animation generator for Unity using LLMs (Tauri + Rust) | 433 | MVP complete |
 
 ## Get started
 
@@ -106,6 +107,8 @@ curl -O https://raw.githubusercontent.com/ThanhWilliamLe/ai-product-bootstrap/ma
 
 Drop it into a conversation with your AI agent and say what you're building. That's it.
 
+Or just copy the contents of [`bootstrapping-guide.md`](bootstrapping-guide.md) and paste it into ChatGPT, Claude, or any AI chat. No install needed.
+
 Or clone the repo if you want to track updates:
 
 ```bash
@@ -114,7 +117,7 @@ git clone https://github.com/ThanhWilliamLe/ai-product-bootstrap.git
 
 ## Contributing
 
-If you run into a project type that doesn't fit, open an issue or PR against `bootstrapping-guide.md`.
+If you run into a project type that doesn't fit, open an issue or PR against `bootstrapping-guide.md`. See our [issue templates](.github/ISSUE_TEMPLATE/) for guided reporting. New examples and edge cases especially welcome.
 
 ## Support
 

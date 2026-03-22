@@ -2,7 +2,7 @@
 
 > This guide is for AI agents. A user gives you this file and asks you to bootstrap their project. Follow the protocol below.
 
-> This guide is standalone. It is not specific to any product or technology.
+> This guide is standalone. It is not specific to any product, technology, or AI tool. It works with any agent that reads markdown — Claude, ChatGPT, Gemini, Copilot, Cursor, or others. The convention of naming files `CLAUDE.md` is a project-governance pattern, not a Claude-specific feature.
 
 ---
 
@@ -16,7 +16,8 @@
 6. [Reference: Session Protocol](#6-reference-session-protocol)
 7. [Examples](#7-examples)
 8. [Anti-Patterns to Avoid During Bootstrap](#8-anti-patterns-to-avoid-during-bootstrap)
-9. [Templates](#9-templates)
+9. [Post-MVP Lifecycle](#9-post-mvp-lifecycle)
+10. [Templates](#10-templates)
 
 ---
 
@@ -28,16 +29,14 @@ An AI agent, given this file by a user who wants to bootstrap a new product deve
 
 ### What you'll produce
 
-By the end of the protocol, the project will have:
-- A hat-based folder structure with governance files
-- Hat profiles defining each role
-- Per-folder CLAUDE.md files with ownership rules and redirects
-- A root CLAUDE.md with session protocol
-- An initialized CEO dashboard with next-action fields for autonomous continuation
-- A discussion roadmap for phased discovery across future sessions
-- Cross-cutting folders (journal, decisions)
-- Infrastructure folders if needed (heavy assets, project tools)
-- An autonomous agent protocol so agents can pick up work without human prompting
+By the end of the protocol, the user will have a project structure that:
+- **Organizes work by role** — folders for each perspective (product thinking, design, architecture, code, testing), so nothing gets mixed up
+- **Plans what to discuss and when** — a phased roadmap of conversations that turns "I have an idea" into a defined product, session by session
+- **Lets agents pick up where they left off** — a dashboard with machine-readable status so the next session starts without re-explaining context
+- **Prevents mistakes** — each folder has rules about what belongs there, what doesn't, and where to put misplaced work
+- **Records decisions** — a journal and decision log so nothing is lost between sessions
+
+Concretely, this means: a folder structure with role-based workspaces, a CLAUDE.md file in each folder with ownership rules, a CEO dashboard tracking progress, a discussion roadmap for phased discovery, and session logs. Everything in plain markdown, committed to git.
 
 ### What you know and don't know
 
@@ -58,6 +57,10 @@ By the end of the protocol, the project will have:
 | Rough sense of what's needed | The specific folder/file taxonomy |
 
 Your job: ask the right questions, make decisions together, then scaffold everything.
+
+### If you want to see what you're building first
+
+Jump to Section 7 (Examples) to see concrete folder structures for different project sizes — from a 7-folder weekend library to a 17-folder team SaaS product. Then come back here to build yours.
 
 ---
 
@@ -130,6 +133,7 @@ After the general questions above, explicitly raise this topic — don't let it 
 | **QA** | Test strategy, edge cases, quality gates | Always (formality varies) |
 | **User** | Validation, dogfooding, honest reactions | Always |
 | **Marketing/DevRel** | Positioning, copy, community, launch | Public release planned |
+| **Repo Ops** | Release management, publish workflow, community triage | Public repo, GitHub/GitLab releases, or separate publish repo |
 | **Data Engineer** | Data pipelines, schemas, ETL | Data-heavy product |
 | **Security** | Threat modeling, auth, compliance | Sensitive data or attack surface |
 | **DevOps/Platform** | CI/CD, infrastructure, deployment | Complex deployment needs |
@@ -140,8 +144,9 @@ After the general questions above, explicitly raise this topic — don't let it 
 - Add UX Designer if there's a user interface.
 - Add BA if there's an ecosystem to research or a market to analyze.
 - Add Marketing if the product will be public.
+- Add Repo Ops if the product has a public repo, GitHub releases, or a separate publish repo. Often added post-MVP when launch approaches — see Post-MVP Lifecycle.
 - Add others based on product specifics.
-- Aim for 4-8 hats. Fewer than 4 = probably merging perspectives that should be separate. More than 8 = probably splitting too fine.
+- Aim for 4-8 hats. Fewer than 4 = probably merging perspectives that should be separate. More than 8 = probably splitting too fine (soft cap — complex projects may legitimately need 8-12; see Step 0).
 
 **Important:** One person can wear multiple hats. The folder structure doesn't change based on team size — only the hat declarations change.
 
@@ -168,7 +173,7 @@ Tier 2: Research
 Tier 3: Requirements
 Tier 4: Design, Architecture (peers — they constrain each other)
 Tier 5: Specs, Quality (peers — contracts and validation)
-Tier 6: Marketing, Rollout, Build Plan (downstream)
+Tier 6: Marketing, Rollout, Build Plan, Release (downstream peers)
 Tier 7: App code (narrowest)
 ```
 
@@ -185,7 +190,7 @@ Tier 7: App code (narrowest)
 
 **Ask the user about each hat:** "What documents or artifacts will the [hat name] hat produce?" Guide them with examples from this table:
 
-| Hat | Typical deliverables | Typical subfolders |
+| Hat / Folder | Typical deliverables | Typical subfolders |
 |-----|---------------------|-------------------|
 | CEO | status-dashboard.md, priorities.md, cross-hat-dependencies.md, hats.md, discussion-roadmap.md | — |
 | Product Owner | problem-statement.md, product-goals.md, personas.md | — |
@@ -197,8 +202,12 @@ Tier 7: App code (narrowest)
 | Developer (Build Plan) | implementation-plan.md, milestones.md (each milestone: scope, dependencies, quality gate, done criteria) | — |
 | Developer (App) | source code, CI/CD config (.github/workflows/ or equivalent). CI at minimum: lint, typecheck, test, build. Multi-platform matrix if desktop/native. | — |
 | QA | test-strategy.md (comprehensive: unit, integration, API/contract, component, E2E, security, performance — see Phase 8 for full list; per-milestone quality gates), edge-cases.md | reports/, plans/ |
-| Marketing | — | copy/, collateral/, screenshots/, plans/ |
+| Marketing | messaging-guide.md | copy/, collateral/, screenshots/, plans/ |
 | Rollout | distribution-strategy.md, first-run-experience.md | — |
+| Repo Ops | publish-checklist.md, release-best-practices.md | — |
+| Data Engineer | data-model.md, pipeline-specs.md, data-quality-rules.md | schemas/, pipelines/, data-quality/ |
+| Security | threat-model.md, auth-design.md, compliance-checklist.md | — |
+| DevOps/Platform | deployment-strategy.md, infrastructure-spec.md, ci-cd-pipeline.md | — |
 
 **Don't over-scaffold.** If a folder will only have 2-3 files, it doesn't need subfolders. If a deliverable is uncertain, don't create a stub — it can be added later. However, if a folder CLAUDE.md's "Read before producing work" will reference a file, that file must exist as a stub at minimum.
 
@@ -304,10 +313,10 @@ Pre-create only the subdirectories for hats the user identified in Step 1 as pro
 | `.heavy-assets.secret` | No (gitignored) | Machine-local sync credentials |
 
 **Scaffolding actions:**
-1. Create `heavy-assets/` with a `CLAUDE.md` (use the Heavy Assets CLAUDE.md template in Section 9).
+1. Create `heavy-assets/` with a `CLAUDE.md` (use the Heavy Assets CLAUDE.md template in Section 10).
 2. Pre-create subdirectories mirroring hat folders that will produce large files (e.g., `heavy-assets/4A-design/mockups/`). Add `.gitkeep` to empty ones.
-3. Create `project-tools/` with a `CLAUDE.md` (use the Project Tools CLAUDE.md template in Section 9).
-4. Create `project-tools/sync-heavy-assets.spec.md` — generate a full spec covering the topics listed in Section 9's Sync Heavy Assets Spec guidance. Adapt the cloud provider to match the user's answer from the Step 1 decision gate.
+3. Create `project-tools/` with a `CLAUDE.md` (use the Project Tools CLAUDE.md template in Section 10).
+4. Create `project-tools/sync-heavy-assets.spec.md` — generate a full spec covering the topics listed in Section 10's Sync Heavy Assets Spec guidance. Adapt the cloud provider to match the user's answer from the Step 1 decision gate.
 5. Add these entries to `.gitignore`:
    ```
    # Heavy assets
@@ -317,6 +326,53 @@ Pre-create only the subdirectories for hats the user identified in Step 1 as pro
    # Sync tool secrets
    .heavy-assets.secret
    ```
+
+#### Publish Repo Pattern (Optional — for public releases)
+
+**Skip this section** if the product won't be publicly released or open-sourced. Otherwise, plan the dual-repo pattern now.
+
+**The pattern:** Maintain two repositories:
+- **Governance repo** (this project) — contains all hat folders, governance files, session journals, decision records, AND the app source code.
+- **Publish repo** (sibling folder) — receives a curated subset of files for public consumption: source code, README, CONTRIBUTING.md, LICENSE. No governance files, no design docs, no session journals.
+
+**Why separate:**
+- Internal design decisions, personas, and competitive research don't belong in a public repo.
+- The governance repo contains the methodology; the publish repo contains the product.
+- Keeps the public repo clean and focused on what users need.
+
+**Scaffolding actions:**
+1. Create the publish repo as a sibling folder (e.g., `../{project-name}-app-{product-name}/`).
+2. Add a Release/Publish folder in the governance repo (e.g., `6D-release/`) with:
+   - `publish-checklist.md` — step-by-step publish procedure
+   - `release-best-practices.md` — asset naming, checksums, changelog format
+   - `CLAUDE.md` — governance for publish workflow
+3. Add `.env` to `.gitignore` — store publish repo PAT and URL there.
+4. The Repo Ops hat owns the publish workflow: sync source → copy marketing README → commit → push → create GitHub release.
+
+**What gets synced to the publish repo:**
+- `{app folder}/` source code (excluding `node_modules/`, `dist/`, `coverage/`, `CLAUDE.md`)
+- Marketing README from `{marketing folder}/readme-draft.md` → publish repo `README.md`
+- `CONTRIBUTING.md` from marketing folder
+- `LICENSE` from root
+
+**What stays in the governance repo only:**
+- All numbered hat folders (0A through 7A+)
+- Cross-cutting folders (AA, AB)
+- Heavy assets
+- `.env` files
+- Per-folder CLAUDE.md files
+
+**Marketing deliverables workflow:** When Marketing hat is active and preparing for launch:
+
+1. **Messaging guide** — one-liner, elevator pitch, value props, tone rules, words-to-avoid. Test with personas.
+2. **README for users** — not developers. Cut architecture, design, and internal sections. Keep: what it does, screenshot/GIF, quick start, features. Test with 3-5 personas — converge on what to cut.
+3. **Landing page** (if applicable) — HTML mockup with design tokens from the UX phase.
+4. **Announcement posts** — platform-adapted (Reddit, HN, Discord). Different tone per platform.
+5. **Comparison guide** — honest positioning vs competitors. Keep separate from README.
+6. **Demo GIF/video** — 4-6 frame walkthrough with captions.
+7. **Slop audit** — verify zero AI cliché words across all deliverables ("revolutionary", "seamlessly", "cutting-edge", "empower").
+
+Research what established projects in your space do for their READMEs. Study 3-5 mature repos for patterns.
 
 ### Step 6: Generate Governance Files
 
@@ -383,9 +439,9 @@ Create a CLAUDE.md in every folder (hat folders + cross-cutting + infrastructure
 
 #### 6c: Root CLAUDE.md
 
-The project entry point. Use the template in Section 9.
+The project entry point. Use the template in Section 10.
 
-Includes: session start protocol, structure listing, conventions, three-layer governance description, cross-hat rules, hat-to-folder table, start-here links.
+Includes: session start protocol, structure listing, conventions, three-layer governance description, cross-hat rules, hat-to-folder table, start-here links, plus protocol sections (multi-round auditing, docs-over-memory, autonomous continuation, user testing, end-of-session sync, output location).
 
 **Do not put in root CLAUDE.md:** current status (goes in CEO dashboard), detailed hat profiles (goes in hats.md), technology decisions (goes in architecture folder), anything that changes frequently.
 
@@ -445,12 +501,22 @@ Phase 4: Feature Scope & MVP
   Goal: Define MVP boundary — what ships, what doesn't
   Populates: {requirements folder} — feature-scope.md, mvp-definition.md
   Depends on: Phases 1, 2, (3 if BA exists — hard blocker if research is foundational)
+  Deferral stress-test: For each deferred feature, ask: "Would the scaled persona
+    (power user at 2-3x normal load) find this painful to lack?" If yes, the
+    deferral may be wrong. Common false deferrals: identity resolution helpers,
+    data visualization (tables aren't enough), third-party integration depth
+    (regex links aren't enough — users want enrichment).
 
 Phase 5: UX Flows & Interaction Design (if UX Designer hat exists)
   Hats: UX Designer, User
   Goal: Define how users interact with the product
   Populates: {design folder} — interaction-model.md, wireframes/
   Depends on: Phases 2, 4
+  Design variant exploration: Build 2-4 visual variants (e.g., different aesthetics,
+    color palettes, layout approaches). Evaluate with User hat + other hats for
+    perspective diversity. Choose and document the aesthetic direction in
+    interaction-model.md. Auditing the prototype against all upstream specs catches
+    design drift early.
 
 Phase 6: Architecture & Tech Stack
   Hats: Developer
@@ -492,7 +558,13 @@ Phase 8: Testing & Quality Strategy
     - Performance — response time baselines, render benchmarks, memory profiling
       - Load — behavior under expected concurrent usage
       - Stress — behavior beyond capacity, graceful degradation
-      - Endurance / soak — sustained load over time, memory leak detection
+      - Endurance / soak — sustained load over time, memory leak detection.
+        Implementation: write tests that exercise core subsystems through 200-1000
+        iteration cycles each (CRUD churn, state store toggling, serialization
+        round-trips, filter cycling). Verify no unbounded array growth, no stale
+        Map entries, no file handle leaks. Run as part of test suite, not separate
+        infrastructure. Example: 57 endurance tests across main process and renderer
+        stores caught accumulation bugs that unit tests missed.
     - Security — input sanitization, auth bypass, path traversal, XSS, CSRF, secrets
       exposure, dependency vulnerability scanning (if Security hat exists, co-own)
     - Usability — task completion, learnability, error recovery (often manual or
@@ -553,6 +625,7 @@ Post-Build: Automated Validation Loop
 - **Split phases** that are too large (Phase 7 often becomes multiple phases for complex products). When splitting, use decimal numbering (Phase 7.1, 7.2) or insertion numbering (Phase 7, Phase 7.5, Phase 8).
 - **Add phases** for project-specific concerns (security review, data architecture, compliance).
 - **Reorder** if the project has unusual dependency structure.
+- **Use Phase N.5 for revisiting earlier work.** A common pattern: do light research early (Phase 1.5), then deep research later (Phase 3.5) that may backtrack earlier assumptions. This prevents over-investing in early phases while still catching assumption errors. The light phase gives "good enough" context to proceed; the deep phase verifies and corrects before downstream phases lock in. Real example: Phase 3.5 deep ecosystem research corrected major assumptions from Phases 1-3 (e.g., "Antigravity is an IDE, not a CLI" — this changed the entire adapter strategy).
 
 #### Blocking prerequisites
 
@@ -575,7 +648,7 @@ vs. soft dependencies:
 
 #### Generate the file
 
-Create `0A-ceo/discussion-roadmap.md` with a Folder Map (which hat owns which folder), then the phases and progress tracker. Use the template in Section 9:
+Create `0A-ceo/discussion-roadmap.md` with a Folder Map (which hat owns which folder), then the phases and progress tracker. Use the template in Section 10:
 
 ```markdown
 # Discussion Roadmap
@@ -765,6 +838,18 @@ Even in minimal mode, the agent should still check the status dashboard and decl
 - **Session start:** Verify dashboard is current.
 - **Session end:** Update with accomplishments, new blockers, hat status changes.
 
+### End-of-Session Sync Protocol
+
+Documentation drifts from reality as implementation outpaces doc updates. At the end of every session with significant code changes, run a sync pass:
+
+1. **Read `0A-ceo/cross-hat-dependencies.md`** — check each open item against current code. Items implemented but not marked resolved are common (observed: 6 of 11 items already done but undocumented).
+2. **Spot-check upstream docs** against implementation — feature-scope.md, use-cases.md, data-model.md, system-design.md are the most likely to drift.
+3. **Update docs to match reality.** Mark completed items. Note any new gaps discovered.
+4. **Update status dashboard** — Recently Completed, Hat Status, Next Action.
+5. **Commit the sync** with a message like "Sync docs with implementation state."
+
+This prevents the "it's already implemented" problem where code is ahead of docs and the next session re-discovers or re-implements completed work.
+
 ### Multi-Hat Sessions
 
 Declare all hats at start. When switching, make it explicit: "Switching from Product Owner to Developer hat."
@@ -895,8 +980,71 @@ Success rate: {X}% ({passed}/{total})
 **Key rules:**
 - Sub-agents get NO conversation context — they test as a fresh user would
 - Each round re-tests everything (fixes can introduce regressions)
-- The 97% threshold is a default — user can override
+- The 97% threshold is a default — user can override. For pre-PMF products, 80% may be appropriate. For production tools, 97%+ is recommended.
 - Validation is the last gate before marketing/launch phases
+- For minimal projects (see Step 0), the validation loop can be simplified to manual testing against the primary persona's use cases — sub-agent orchestration is optional
+
+**Iterative test-fix cycle:** The validation loop in practice runs as a tight cycle:
+
+```
+1. User hat sub-agent navigates the live app (via browser tool or Playwright), tests features, captures evidence
+2. QA hat analyzes findings, categorizes severity, calculates effectiveness rate
+3. Developer hat sub-agents (up to 5 in parallel) implement fixes with file ownership boundaries
+4. CEO verifies fixes, audits quality, triggers next cycle
+```
+
+Real progression example: Cycle 1 (view-level) 95.5% → Cycle 2 (feature-level) 65.1% → 82.5% → Cycle 3 (targeted) 97.8%. The rate drops when you switch from view-level to feature-level testing — this is expected and healthy. Feature-level tests are more honest.
+
+**Parallel fix dispatch:** When many failures exist, dispatch multiple Developer sub-agents in parallel with strict file ownership:
+
+```
+Agent A: Subsystem 1 (owns: files in src/feature-a/)
+Agent B: Subsystem 2 (owns: files in src/feature-b/)
+Agent C: Subsystem 3 (owns: files in src/feature-c/)
+...
+```
+
+Each agent owns specific files or directories. No two agents touch the same files. CEO orchestrates and reconciles. Define ownership boundaries by feature directory, module, or file name pattern — whatever creates the cleanest separation for your codebase.
+
+**Simulated usability testing:** Before or alongside the validation loop, run a simulated usability test with 3-5 AI personas walking through every major flow independently:
+
+```
+1. Define 3-5 diverse personas (e.g., Power User, New Adopter, Non-Technical User, Team Lead, Single-Tool User)
+2. Each persona walks through the app independently with realistic scenarios
+3. Each persona reports issues from their perspective with severity ratings
+4. Cross-persona convergence analysis: issues flagged by 3+ personas are highest-confidence findings
+5. Fix convergent issues first, then address persona-specific issues
+```
+
+Report format:
+```markdown
+# Simulated Usability Test — {date}
+
+| # | Persona | Profile | Issues Found |
+|---|---------|---------|-------------|
+| 1 | Power User | Senior dev, multiple tools, many components | 23 |
+| 2 | Non-Technical User | QA analyst, single tool, no coding | 25 |
+
+## Cross-Persona Convergence (3+ personas)
+### 1. {Issue title}
+**Flagged by:** {personas}
+**Severity:** {CRITICAL/HIGH/MEDIUM/LOW}
+{Description and recommended fix}
+```
+
+Real example: 5-persona test found 107 issues with 7 cross-persona convergent themes, leading to 16 concrete fixes (keyboard shortcuts, terminology standardization, first-run UX, tooltips).
+
+Note: Simulated testing is fast and scalable but doesn't replace real human testing. Document explicitly: "Simulated usability test complete. Real human testing recommended for validation."
+
+### User Testing Protocol (for root CLAUDE.md)
+
+Add this section to the root CLAUDE.md template when personas are defined:
+
+```markdown
+### User Testing Protocol
+
+When "user testing" is requested, simulate **all personas** defined in `{vision folder}/personas.md` — not just the primary. Optionally, improvise 1-2 ad-hoc personas (e.g., a skeptical first-timer, a non-technical manager) to stress-test from unexpected angles. Each persona reports independently; reconciliation happens cross-persona, not per-persona.
+```
 
 ---
 
@@ -948,11 +1096,11 @@ AA-journal/
 AB-decisions/
 ```
 
-5 tiers, no design folder, no marketing, no research. Scales down cleanly.
+6 tiers (0-5), no design folder, no marketing, no research. Scales down cleanly.
 
 ### Example C: Team Building a SaaS Platform
 
-**10 hats:** CEO, PO, BA, UX Designer, Developer, QA, User, Marketing, Security, DevOps
+**11 hats:** CEO, PO, BA, UX Designer, Developer, QA, User, Marketing, Repo Ops, Security, DevOps
 
 ```
 0A-ceo/
@@ -968,13 +1116,14 @@ AB-decisions/
 6A-marketing/
 6B-rollout/
 6C-build-plan/
-6D-infrastructure/
+6D-release/
+6E-infrastructure/
 7A-app/
 AA-journal/
 AB-decisions/
 ```
 
-Security at 4C — peer with design and architecture because security constraints shape both. Infrastructure at 6D — peer with rollout (deployment concerns).
+Security at 4C — peer with design and architecture because security constraints shape both. Release at 6D — Repo Ops manages publish workflow, GitHub releases, community triage. Infrastructure at 6E — peer with rollout (deployment concerns). Repo Ops hat may be added post-MVP when launch approaches rather than during bootstrap.
 
 ### Example D: Data-Heavy Analytics Product
 
@@ -1015,7 +1164,7 @@ These are mistakes made during scaffolding, not during ongoing work:
 ### Wrong Tier Assignment
 
 **Symptom:** Architecture at tier 2 (too high — it's not broader than requirements) or Vision at tier 4 (too low — it shapes everything).
-**Fix:** Re-run the influence radius question: "If this hat changes its mind, how many other hats are affected?" Higher impact = lower tier number.
+**Fix:** Re-run the influence radius question: "If the decisions in this folder change, how many other folders are affected?" Higher impact = lower tier number.
 
 ### False Peers
 
@@ -1052,9 +1201,94 @@ These are mistakes made during scaffolding, not during ongoing work:
 **Symptom:** All milestones complete, agent declares product "done" without testing real user scenarios.
 **Fix:** Run the automated validation loop (Section 6) with sub-agents wearing persona hats. Ship only after 97%+ scenario pass rate.
 
+### Stale Docs After Implementation
+
+**Symptom:** Code implements features but cross-hat-dependencies.md, feature-scope.md, or other upstream docs aren't updated. Next session re-discovers or re-implements completed work.
+**Fix:** Run the End-of-Session Sync Protocol (Section 6) at the end of every session with code changes. Common finding: 50%+ of "open" cross-hat items are already resolved in code but undocumented. Documentation debt compounds faster than technical debt.
+
+### False Deferrals
+
+**Symptom:** Features deferred from MVP turn out to be essential within one version. The team builds v1.0, then immediately needs to build v1.1 for the same features they deferred.
+**Fix:** Stress-test every deferral against scaled personas during Phase 4. Ask: "Would a power user at 2-3x normal scale find this painful?" Common false deferrals: identity resolution (manual mapping doesn't scale past 10 entities), data visualization (tables satisfy the metric but not the user), third-party enrichment (regex links aren't enough — users want titles and statuses). If a "deferred" feature will be needed within one version, it's not deferred — it's just late.
+
+### Expecting Instant Governance Compliance
+
+**Symptom:** First few sessions have cross-folder violations — artifacts landing in wrong places, hat boundaries crossed, redirects ignored.
+**Fix:** This is normal. Governance compliance follows a predictable curve: theoretical (sessions 1-2) → enforced (sessions 3-5) → internalized (sessions 10+). Don't panic about early violations. The governance structure self-corrects as agents read folder CLAUDE.md files more consistently. Flag violations but don't over-invest in preventing them during bootstrap.
+
 ---
 
-## 9. Templates
+## 9. Post-MVP Lifecycle
+
+The bootstrapping protocol covers idea → MVP. This section covers what happens after MVP ships. These patterns are extracted from projects that used this guide and went through 3-5 post-MVP versions each.
+
+### Version Planning
+
+After MVP ships, the project enters a release cycle. Plan each version as a mini-roadmap:
+
+1. **Collect the backlog.** Sources: deferred features from Phase 4, user testing findings, validation loop failures, cross-hat dependencies filed during build, and new ideas.
+2. **Prioritize ruthlessly.** Create a "Fast-Follow Backlog" section in the status dashboard:
+   ```markdown
+   ## Fast-Follow Backlog (Prioritized)
+   | # | ID | Feature | Status |
+   |---|----|---------|--------|
+   | 1 | USR-06 | Plugin update mechanism | Pending |
+   | 2 | USR-03 | Project-scope scanning | Pending |
+   ```
+3. **Create versioned build plans.** Each version gets its own implementation plan and milestones file (e.g., `v1.1-implementation-plan.md`, `v1.1-milestones.md` in the build plan folder).
+4. **Run quality gates per version.** Same milestone state machine (not-started → in-progress → gates-passing → complete). Same audit protocol.
+
+### Adding Hats Post-MVP
+
+New hats often emerge when launch approaches. The most common:
+
+- **Repo Ops** — added when the product needs a public repo, GitHub releases, or community management. Creates a Release/Publish folder at the same tier as Marketing/Rollout.
+- **Business Analyst (post-launch)** — added for competitive positioning, market research for v2 direction. May land at a high tier number (e.g., 8A-research) since post-launch research informs future direction rather than constraining current design.
+
+**When adding a hat post-MVP:**
+1. Create the hat profile in `0A-ceo/hats.md`.
+2. Create the folder with appropriate tier prefix. Post-MVP hats can use higher tier numbers — their influence radius is narrower because the core product is already designed.
+3. Create the folder's CLAUDE.md with governance rules.
+4. Update root CLAUDE.md's hat table and structure listing.
+5. Update the discussion roadmap with new phases if needed.
+
+**Tier re-ordering for post-MVP hats:** Tiers can reflect temporal ordering for hats added after launch. A research folder at tier 8 (after the app at tier 6) is valid if the research informs future versions rather than the current design. The influence radius question still applies, just within the scope of "what does this change affect going forward?"
+
+### Refreshing the Discussion Roadmap
+
+The discussion roadmap doesn't end at MVP. Extend it:
+
+```markdown
+## Post-MVP Phases
+
+### Phase 11 — v1.1 Scope & Planning
+- **Hats:** Product Owner, Developer
+- **Goal:** Prioritize fast-follow backlog, plan v1.1 milestones
+- **Deliverables:**
+  - `{build-plan folder}/v1.1-implementation-plan.md`
+  - `{build-plan folder}/v1.1-milestones.md`
+
+### Phase 12 — Launch Preparation (if Repo Ops/Marketing hats exist)
+- **Hats:** Marketing, Repo Ops
+- **Goal:** Prepare public repo, marketing materials, release assets
+- **Deliverables:**
+  - `{marketing folder}/readme-draft.md`
+  - `{release folder}/publish-checklist.md`
+```
+
+### The "Zero Deferred Features" Metric
+
+A strong signal of guide effectiveness: all three proof projects shipped every feature they planned — zero deferred features remaining. This isn't an accident. The guide's Phase 4 deferral stress-test forces honest assessment of what's truly deferrable. Combined with versioned build plans, features deferred from MVP ship in v1.1 or v1.2 rather than accumulating as permanent backlog.
+
+Track this metric in the status dashboard: how many features were planned, how many shipped, how many remain deferred.
+
+### Documentation-to-Code Ratio
+
+Expect the governance repo to contain far more documentation than code. One proof project had 102,667 lines of markdown and 1,839 lines of app code (56:1 ratio). This is by design — the documentation is the project's institutional memory. The code is the output. Don't be alarmed by the ratio; it means the methodology is working.
+
+---
+
+## 10. Templates
 
 ### Root CLAUDE.md
 
@@ -1139,6 +1373,19 @@ Agents can work without human prompting by following the pick-up-work loop:
 4. If more actions remain and no blockers: continue
 
 Always update the Next Action table at session end so the next agent (or next session) can continue seamlessly.
+
+### User Testing Protocol
+
+When "user testing" is requested, simulate **all personas** defined in `{vision folder}/personas.md` — not just the primary. Optionally, improvise 1-2 ad-hoc personas (e.g., a skeptical first-timer, a non-technical manager) to stress-test from unexpected angles. Each persona reports independently; reconciliation happens cross-persona, not per-persona.
+
+### End-of-Session Sync
+
+At the end of every session with significant code changes, run a sync pass:
+1. Read all open items in `0A-ceo/cross-hat-dependencies.md` — verify each against current code.
+2. Spot-check upstream docs (feature-scope, use-cases, data-model, system-design) against implementation.
+3. Update docs to match reality. Mark completed items.
+4. Update status dashboard — Recently Completed, Hat Status, Next Action.
+5. Commit the sync.
 
 ### Output Location
 
