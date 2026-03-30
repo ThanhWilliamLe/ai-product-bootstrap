@@ -2,9 +2,9 @@
 
 # AI Product Bootstrap
 
-**A structured way to build products with AI agents. One markdown file. Works with any LLM.**
+**A structured way to build products with AI agents. Two files. CEO loop. Sub-agent dispatch.**
 
-Give this guide to your AI agent. The agent sets up organized folders and a plan for what to figure out first.
+Give this guide to Claude Code. It sets up an autonomous orchestration system: a CEO agent that reads state, dispatches specialized sub-agents, verifies results, and keeps going.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/ThanhWilliamLe/ai-product-bootstrap/pulls)
@@ -13,90 +13,78 @@ Give this guide to your AI agent. The agent sets up organized folders and a plan
 
 ---
 
-For developers and founders who use AI agents to build products and are tired of re-explaining context each session.
-
-Works with Claude, ChatGPT, Gemini, Copilot, Cursor. Anything that reads markdown.
-
-## How to use
+## How it works
 
 ```mermaid
 flowchart LR
-    A["📄 You give the guide\nto your AI agent"] --> B["💬 Agent asks about\nyour project"]
-    B --> C["🏗️ Agent scaffolds\nfolders + governance"]
-    C --> D["🗺️ Agent generates\na discussion roadmap"]
-    D --> E["🔄 Agent picks up\nwork autonomously\nacross sessions"]
-    E --> F["✅ Validates with\nsub-agents until\ntests pass"]
+    A["You give the guide\nto Claude Code"] --> B["Agent asks 7 questions\nabout your project"]
+    B --> C["Generates CLAUDE.md\n+ PROJECT.md\n+ agents with skills,\nMCP, hooks, rules"]
+    C --> D["Next session:\nCEO loop runs\nautonomously"]
+    D --> E["Dispatches sub-agents\nverifies, commits,\nrepeats"]
 ```
 
-1. Drop [`bootstrapping-guide.md`](bootstrapping-guide.md) into a conversation
+1. Drop [`bootstrapping-guide.md`](bootstrapping-guide.md) into a Claude Code conversation
 2. Describe what you're building
 3. Answer a few questions
-4. The agent builds the project scaffold:
-
-The number of folders scales to your project. A weekend library might get 7, a team SaaS product 16. Here's a standard example:
+4. The agent produces your project's operating system:
 
 ```
-0A-ceo/                  # Dashboard, priorities, roadmap
-1A-vision/               # Problem, goals, personas
-2A-research/             # Ecosystem, competitors
-3A-requirements/         # Scope, MVP definition
-4A-design/               # Interaction model, wireframes
-4B-architecture/         # System design, tech stack
-5A-specs/                # Feature specifications
-5B-quality/              # Test strategy, edge cases
-6A-build-plan/           # Implementation plan
-7A-app/                  # Source code
-AA-journal/              # Session logs
-AB-decisions/            # Decision records
+CLAUDE.md                  # CEO operating manual — the loop, dispatch rules, conventions
+PROJECT.md                 # Live state — goals, work queue, decisions
+.claude/
+├── agents/                # Sub-agents with skills, MCP servers, hooks, permissions
+├── rules/                 # Path-specific context (shared across agents)
+└── settings.json          # Project-level defaults
+docs/                      # Knowledge base — decisions, specs, research (as needed)
 ```
 
-Each folder has a governance file that says what belongs and where to redirect mistakes. Next session, the agent reads these first and picks up your context.
+Next session, Claude reads CLAUDE.md automatically, becomes the CEO, reads PROJECT.md, and starts working.
 
 ## What's behind it
 
-Four ideas drive the guide:
+**CEO orchestration.** The main Claude Code agent is always the CEO. It reads state, decides what's next, dispatches sub-agents to do the work, verifies results, and loops. It doesn't implement — it orchestrates.
 
-**Hats.** The agent declares a role before doing anything. Product Owner thinks about *what* to build, Developer thinks about *how*. You get focused answers instead of a mix of strategy and implementation.
+**Sub-agent dispatch.** Each agent type (developer, researcher, designer, qa) has its own definition in `.claude/agents/` with scoped tools, file ownership, conventions, verification commands, preloaded skills, MCP server access, safety hooks, and permission modes. Agents get fresh context windows — no context rot.
 
-**Tiers.** Folders are numbered by how much their decisions ripple outward. You work top-down. AI agents won't do that on their own.
+**Bounded state.** PROJECT.md is a sliding window, not a ledger. Done items clear on version ship. Git tags are the archive. The file never grows past ~150 lines.
 
-```mermaid
-flowchart LR
-    T1["Tier 1 · Vision\nchanges ripple everywhere"] --> T4["Tier 4 · Architecture\nchanges ripple locally"] --> T7["Tier 7 · Code\nchanges stay here"]
-```
-
-**Discussion roadmap.** Folders start as empty stubs. You fill them across sessions, each phase with a goal and deliverables.
+**Same loop, always.** There's no mode switch between "planning" and "building" and "post-launch." Discovery is just work items with type `discover`. Building is items with type `build`. Version 0.1 through 5.0 — same loop.
 
 ```mermaid
 flowchart LR
-    R1["Phase 1\nVision"] --> R2["Phase 2\nUsers"] --> R3["Phase 3\nScope"] --> R4["Phase 4\nDesign"] --> R5["Phase 5\nBuild"] --> R6["Phase 6\nValidate"]
+    R["Read\nPROJECT.md"] --> P["Pick next\nready item"]
+    P --> D["Dispatch\n@agent"]
+    D --> V["Verify\nresult"]
+    V --> C["Commit +\nupdate state"]
+    C --> R
 ```
 
-**Autonomous continuation.** The dashboard has a machine-readable "Next Action" table. Agents pick up work without you prompting. After build, a validation loop spawns sub-agents as different users to test scenarios.
+## Agent infrastructure
 
-> [!TIP]
-> You don't need to understand any of this before starting. The agent walks you through it.
+Each agent definition is a fully-configured Claude Code agent — not just a prompt. The installer generates:
 
-## Examples
+| Feature | What it does | Example |
+|---------|-------------|---------|
+| **Skills** | Preloads domain knowledge into agent context | `skills: [python-testing-patterns, frontend-patterns]` |
+| **MCP servers** | Scoped external tools (database, browser, APIs) | Playwright for QA, PostgreSQL for data agents |
+| **Hooks** | Enforces scope constraints at runtime | Designer blocked from writing `.py`/`.ts` files |
+| **Rules** | Path-specific context shared across agents | `src/**` conventions load for any agent touching source |
+| **Permissions** | Controls autonomy level per agent | `acceptEdits` for builders, `default` for read-only |
+| **Effort/Turns** | Cost control and runaway prevention | `maxTurns: 30`, `effort: medium` |
 
-The guide includes examples for different project sizes:
+All inferred from 7 discovery questions. Degrades gracefully — if no skills are installed or no MCP needed, agents work fine with built-in tools.
 
-| Project type | Roles | Folders |
-|-------------|-------|---------|
-| Open source library | 4 | 7 |
-| CLI tool | 5 | 10 |
-| SaaS platform | 10 | 16 |
-| Analytics product | 6 | 10 |
+## Token efficiency
 
-Plus templates for governance files: dashboards, role profiles, decision records, session logs.
+Three-tier context model inspired by [Codified Context](https://arxiv.org/abs/2602.20478):
 
-### Built with this guide
+| Tier | What | When loaded | Size |
+|------|------|-------------|------|
+| 1 | CLAUDE.md + PROJECT.md | Every session (auto) | ~300-500 lines |
+| 2 | Agent definitions | On dispatch only | ~50-100 lines each |
+| 3 | docs/ + src/ | On demand by agents | Variable |
 
-| Project | What it is | Tests | Status |
-|---------|-----------|-------|--------|
-| [ai-plugin-manager](https://github.com/ThanhWilliamLe/ai-plugin-manager) | Desktop app to manage AI tool plugins across Claude, Gemini, and more | 1,780+ | v1.5 shipped |
-| [devlead-station](https://github.com/ThanhWilliamLe/devlead-station) | Local-first code review and team evaluation tool for dev leads | 596 | v1.2 shipped |
-| [ai-animator](https://github.com/ThanhWilliamLe/ai-animator) | AI-powered animation generator for Unity using LLMs (Tauri + Rust) | 433 | MVP complete |
+CEO pays for Tier 1 only. Sub-agents get focused context. Main conversation stays light.
 
 ## Get started
 
@@ -105,19 +93,34 @@ Plus templates for governance files: dashboards, role profiles, decision records
 curl -O https://raw.githubusercontent.com/ThanhWilliamLe/ai-product-bootstrap/main/bootstrapping-guide.md
 ```
 
-Drop it into a conversation with your AI agent and say what you're building. That's it.
+Drop it into Claude Code and say what you're building. That's it.
 
-Or just copy the contents of [`bootstrapping-guide.md`](bootstrapping-guide.md) and paste it into ChatGPT, Claude, or any AI chat. No install needed.
+## What changed from v1
 
-Or clone the repo if you want to track updates:
+v1 was a 1200-line guide with 16 governance folders, hat declarations, tier assignments, and a session protocol that loaded 4 files before any work started. It worked well for initial builds (0 to 1.0) but broke down for ongoing development, cost too many tokens, and wasn't truly autonomous.
 
-```bash
-git clone https://github.com/ThanhWilliamLe/ai-product-bootstrap.git
-```
+v2 is 300 lines. Two files. One loop. Works from day one through version N.
+
+| v1 | v2 |
+|---|---|
+| 16 folders with CLAUDE.md each | Flat: CLAUDE.md + PROJECT.md + agents/ + docs/ |
+| Load 4 governance files per session | Auto-load 2 files, agents load on dispatch |
+| Declare a "hat" before working | CEO dispatches the right agent automatically |
+| Discussion roadmap with phases | Work queue with dependencies |
+| Post-MVP needs different workflow | Same loop, same files, always |
+| 56:1 doc-to-code ratio | Docs grow organically, stay lean |
+
+## Built with this guide
+
+| Project | What it is | Status |
+|---------|-----------|--------|
+| [ai-plugin-manager](https://github.com/ThanhWilliamLe/ai-plugin-manager) | Desktop app to manage AI tool plugins | v1.5 shipped |
+| [devlead-station](https://github.com/ThanhWilliamLe/devlead-station) | Local-first code review tool for dev leads | v1.2 shipped |
+| [ai-animator](https://github.com/ThanhWilliamLe/ai-animator) | AI-powered animation generator for Unity | MVP complete |
 
 ## Contributing
 
-If you run into a project type that doesn't fit, open an issue or PR against `bootstrapping-guide.md`. See our [issue templates](.github/ISSUE_TEMPLATE/) for guided reporting. New examples and edge cases especially welcome.
+If you run into a project type that doesn't fit, open an issue or PR against `bootstrapping-guide.md`. See our [issue templates](.github/ISSUE_TEMPLATE/) for guided reporting.
 
 ## Support
 
